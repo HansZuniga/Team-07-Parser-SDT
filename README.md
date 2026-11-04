@@ -48,10 +48,7 @@ CLR(1) Parser
 Parse Tree
       |
       v
-Syntax-Directed Translation
-      |
-      v
-Semantic Analysis
+SDT / Semantic Analysis
       |
       v
 Result
