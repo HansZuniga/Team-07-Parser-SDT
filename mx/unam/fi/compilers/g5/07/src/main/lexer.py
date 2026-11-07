@@ -24,10 +24,11 @@ Design reference:
 This implementation follows the team's "Especificacion de tokens y
 expresiones regulares" document (docs/Especificacion_Tokens.pdf):
 
-    KEYWORD      (?:print|int|return|if|else)
+    KEYWORD      (?:print|int|float|char|return|if|else|while)
     IDENTIFIER   [A-Za-z_][A-Za-z0-9_]*
     CONSTANT     [0-9]+(?:\.[0-9]+)?
-    LITERAL      "[^"\r\n]*"
+    LITERAL      "[^"\r\n]*"                          (string literal)
+               | '(?:[^'\\\r\n]|\\[ntr0\\'"])'         (character literal)
     OPERATOR     ==|!=|<=|>=|[=+*/<>-]
     PUNCTUATION  [(){};,]
 
@@ -43,6 +44,10 @@ Error handling:
   "1.2.3"). It is never split into partially valid tokens.
 - An unterminated string literal is consumed up to the next newline or the
   end of the input and reported as a single lexical error.
+- A malformed character literal (empty '', more than one character such as
+  'ab', an unknown escape sequence, or a missing closing quote) is consumed
+  up to the next single quote on the same line, or up to the end of the
+  line if there is none, and reported as a single lexical error.
 - Any other unrecognized character is reported as a one-character lexical
   error and the scan advances a single position.
 - Lexical errors are not included in the total count of valid tokens.
@@ -52,7 +57,9 @@ import re
 from pathlib import Path
 
 # Default reserved words, used when no keywords.txt resource is supplied.
-DEFAULT_KEYWORDS = {"print", "int", "return", "if", "else"}
+DEFAULT_KEYWORDS = {
+    "print", "int", "float", "char", "return", "if", "else", "while",
+}
 
 # A malformed numeric candidate: starts with a digit and may continue with
 # digits, letters, underscores or dots. Used to capture ill-formed numeric
@@ -64,6 +71,9 @@ _NUMERIC_CANDIDATE_RE = re.compile(r"[0-9][0-9A-Za-z_.]*")
 _CONSTANT_RE = re.compile(r"[0-9]+(?:\.[0-9]+)?")
 _IDENTIFIER_RE = re.compile(r"[A-Za-z_][A-Za-z0-9_]*")
 _LITERAL_RE = re.compile(r'"[^"\r\n]*"')
+# A character literal holds exactly one character or one simple escape
+# sequence: 'a', '7', ' ', '\n', '\t', '\r', '\0', '\\', '\'' or '\"'.
+_CHAR_LITERAL_RE = re.compile(r"""'(?:[^'\\\r\n]|\\[ntr0\\'"])'""")
 _OPERATOR_RE = re.compile(r"==|!=|<=|>=|[=+*/<>-]")
 _PUNCTUATION_RE = re.compile(r"[(){};,]")
 
@@ -197,6 +207,18 @@ class Lexer:
                 pos, column = self._advance(pos, column, len(lexeme))
                 continue
 
+            # Character literals.
+            if char == "'":
+                match = _CHAR_LITERAL_RE.match(text, pos)
+                if match:
+                    lexeme = match.group()
+                    self._add_token("LITERAL", lexeme, line, column)
+                else:
+                    lexeme = self._malformed_char_literal(text, pos)
+                    self._add_error(lexeme, line, column)
+                pos, column = self._advance(pos, column, len(lexeme))
+                continue
+
             # Identifiers and keywords. The pattern itself decides whether an
             # identifier starts here: str.isalpha() also accepts non-ASCII
             # letters (e.g. "á") that the IDENTIFIER pattern does not allow.
@@ -240,6 +262,21 @@ class Lexer:
             pos, column = self._advance(pos, column, 1)
 
         return self.tokens
+
+    @staticmethod
+    def _malformed_char_literal(text, pos):
+        """
+        Return the lexeme of an invalid character literal that starts at
+        `pos`: everything up to and including the next single quote on the
+        same line, or up to the end of the line/input if there is none.
+        """
+        line_end = text.find("\n", pos)
+        if line_end == -1:
+            line_end = len(text)
+        closing = text.find("'", pos + 1, line_end)
+        if closing == -1:
+            return text[pos:line_end]
+        return text[pos:closing + 1]
 
     @staticmethod
     def _advance(pos, column, consumed):

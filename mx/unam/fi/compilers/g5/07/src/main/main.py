@@ -11,6 +11,10 @@ Analyze a literal string:
 
     python main.py --text 'int a = 10;'
 
+Show the terminal sequence the CLR(1) parser will receive:
+
+    python main.py --text 'int a = 10;' --terminals
+
 With no arguments, it runs the professor's reading example:
 
     printf("This is an example");
@@ -21,6 +25,7 @@ import argparse
 from pathlib import Path
 
 from lexer import Lexer
+from token_stream import LexicalError, build_terminals
 
 RESOURCES_DIR = Path(__file__).resolve().parents[2] / "resources"
 DEFAULT_EXAMPLE = Path(__file__).resolve().parents[2] / "examples" / "example_profesor.c"
@@ -46,11 +51,34 @@ def print_report(lexer: Lexer) -> None:
         print(f"Total of lexical errors: {len(lexer.errors)}")
 
 
+def print_terminals(lexer: Lexer) -> None:
+    try:
+        terminals = build_terminals(lexer.tokens, lexer.errors)
+    except LexicalError as error:
+        print(error)
+        return
+
+    print(f"{'TERMINAL':<12} {'LEXEME':<25} {'LINE':<6} {'COLUMN':<6}")
+    print("-" * 52)
+    for terminal in terminals:
+        print(
+            f"{terminal.symbol:<12} {terminal.lexeme!r:<25} "
+            f"{terminal.line:<6} {terminal.column:<6}"
+        )
+    print()
+    print("Parser input: " + " ".join(t.symbol for t in terminals))
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description="Team 07 lexical analyzer")
     group = parser.add_mutually_exclusive_group()
     group.add_argument("--file", help="path to a source file to scan")
     group.add_argument("--text", help="literal source text to scan")
+    parser.add_argument(
+        "--terminals",
+        action="store_true",
+        help="show the grammar terminals sent to the parser instead of the tokens",
+    )
     args = parser.parse_args()
 
     keywords_path = RESOURCES_DIR / "keywords.txt"
@@ -63,7 +91,10 @@ def main() -> None:
     else:
         lexer.tokenize_file(DEFAULT_EXAMPLE)
 
-    print_report(lexer)
+    if args.terminals:
+        print_terminals(lexer)
+    else:
+        print_report(lexer)
 
 
 if __name__ == "__main__":
