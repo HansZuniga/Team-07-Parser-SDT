@@ -1,6 +1,7 @@
 """
 Tests for the lexer changes needed by the Parser & SDT scope (issue #1):
-new keywords float/char/while and character literals.
+new keywords float/char/while, character literals and the
+operators % and ! used by the CLR(1) grammar.
 """
 
 from pathlib import Path
@@ -51,6 +52,26 @@ def test_main_is_an_identifier():
     lexer = make_lexer()
     lexer.tokenize("int main ( )")
     assert token_tuples(lexer)[1] == ("IDENTIFIER", "main")
+
+
+@pytest.mark.parametrize("operator", ["%", "!"])
+def test_modulo_and_logical_not_are_operators(operator):
+    lexer = make_lexer()
+    lexer.tokenize(f"a {operator} b")
+    assert token_tuples(lexer)[1] == ("OPERATOR", operator)
+    assert lexer.errors == []
+
+
+def test_not_equal_is_still_one_operator():
+    lexer = make_lexer()
+    lexer.tokenize("!a != !b")
+    assert token_tuples(lexer) == [
+        ("OPERATOR", "!"),
+        ("IDENTIFIER", "a"),
+        ("OPERATOR", "!="),
+        ("OPERATOR", "!"),
+        ("IDENTIFIER", "b"),
+    ]
 
 
 def test_while_statement():

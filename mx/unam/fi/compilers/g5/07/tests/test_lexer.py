@@ -193,9 +193,9 @@ def test_unterminated_string_stops_at_newline():
 
 def test_undefined_operator_characters_are_errors():
     lexer = make_lexer()
-    lexer.tokenize("a & b ! c")
+    lexer.tokenize("a & b | c")
     error_lexemes = [e.lexeme for e in lexer.errors]
-    assert error_lexemes == ["&", "!"]
+    assert error_lexemes == ["&", "|"]
 
 
 def test_undefined_bracket_characters_are_errors():

@@ -29,12 +29,18 @@ def symbols(terminals):
     [
         ("KEYWORD", "int", "int"),
         ("KEYWORD", "while", "while"),
-        ("IDENTIFIER", "x", "id"),
-        ("IDENTIFIER", "main", "id"),
-        ("CONSTANT", "10", "num"),
-        ("CONSTANT", "3.5", "num"),
-        ("LITERAL", "'a'", "char_lit"),
-        ("LITERAL", '"hello"', "string_lit"),
+        ("IDENTIFIER", "x", "ID"),
+        ("IDENTIFIER", "main", "main"),
+        ("IDENTIFIER", "mainLoop", "ID"),
+        ("CONSTANT", "10", "INT"),
+        ("CONSTANT", "0", "INT"),
+        ("CONSTANT", "3.5", "FLOAT"),
+        ("CONSTANT", "0.0", "FLOAT"),
+        ("LITERAL", "'a'", "CHAR"),
+        ("LITERAL", '"hello"', "STRING"),
+        ("OPERATOR", "%", "%"),
+        ("OPERATOR", "!", "!"),
+        ("OPERATOR", "!=", "!="),
         ("OPERATOR", "=", "="),
         ("OPERATOR", "<=", "<="),
         ("PUNCTUATION", ";", ";"),
@@ -56,14 +62,26 @@ def test_unknown_token_type_is_rejected():
 
 def test_issue_7_example():
     terminals = tokenize_source("int x = 10;")
-    assert symbols(terminals) == ["int", "id", "=", "num", ";", "$"]
+    assert symbols(terminals) == ["int", "ID", "=", "INT", ";", "$"]
 
 
 def test_lexeme_line_and_column_are_preserved():
     terminals = tokenize_source("int x = 10;\n  x = x + 1;")
     x_use = terminals[5]
-    assert (x_use.symbol, x_use.lexeme, x_use.line, x_use.column) == ("id", "x", 2, 3)
+    assert (x_use.symbol, x_use.lexeme, x_use.line, x_use.column) == ("ID", "x", 2, 3)
     assert x_use.token.type == "IDENTIFIER"
+
+
+def test_modulo_and_logical_not_reach_the_parser():
+    terminals = tokenize_source("x = !(a % 2 != 0);")
+    assert symbols(terminals) == [
+        "ID", "=", "!", "(", "ID", "%", "INT", "!=", "INT", ")", ";", "$",
+    ]
+
+
+def test_string_literal_maps_to_string_terminal():
+    terminals = tokenize_source('return "hola";')
+    assert symbols(terminals) == ["return", "STRING", ";", "$"]
 
 
 def test_token_order_is_preserved():
@@ -87,14 +105,14 @@ def test_full_supported_subset_program():
     )
     terminals = tokenize_source(source)
     assert symbols(terminals) == [
-        "int", "id", "(", ")", "{",
-        "int", "id", "=", "num", ";",
-        "float", "id", "=", "num", ";",
-        "char", "id", "=", "char_lit", ";",
-        "if", "(", "id", ">", "num", ")", "{", "id", "=", "id", "-", "num", ";", "}",
-        "else", "{", "id", "=", "id", "*", "num", ";", "}",
-        "while", "(", "id", "!=", "num", ")", "{", "id", "=", "id", "-", "num", ";", "}",
-        "return", "num", ";",
+        "int", "main", "(", ")", "{",
+        "int", "ID", "=", "INT", ";",
+        "float", "ID", "=", "FLOAT", ";",
+        "char", "ID", "=", "CHAR", ";",
+        "if", "(", "ID", ">", "INT", ")", "{", "ID", "=", "ID", "-", "INT", ";", "}",
+        "else", "{", "ID", "=", "ID", "*", "INT", ";", "}",
+        "while", "(", "ID", "!=", "INT", ")", "{", "ID", "=", "ID", "-", "INT", ";", "}",
+        "return", "INT", ";",
         "}", "$",
     ]
 
@@ -149,12 +167,12 @@ def test_build_terminals_rejects_errors_from_any_lexer_run():
 
 
 def test_terminal_repr_is_readable():
-    terminal = Terminal("id", Token("IDENTIFIER", "x", 3, 7), 3, 7)
-    assert repr(terminal) == "Terminal('id', lexeme='x', line=3, column=7)"
+    terminal = Terminal("ID", Token("IDENTIFIER", "x", 3, 7), 3, 7)
+    assert repr(terminal) == "Terminal('ID', lexeme='x', line=3, column=7)"
 
 
 def test_tokenize_file(tmp_path):
     source = tmp_path / "program.c"
     source.write_bytes(b"\xef\xbb\xbfchar c = 'a';")
     terminals = tokenize_file(source)
-    assert symbols(terminals) == ["char", "id", "=", "char_lit", ";", "$"]
+    assert symbols(terminals) == ["char", "ID", "=", "CHAR", ";", "$"]

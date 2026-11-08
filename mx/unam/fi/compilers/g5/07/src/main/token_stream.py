@@ -12,7 +12,7 @@ Bridge between the lexical analyzer and the CLR(1) parser (issue #7).
 
 The lexer classifies lexemes into broad categories (KEYWORD, IDENTIFIER,
 CONSTANT, ...), while the ACTION/GOTO table is indexed by the terminal
-symbols of the grammar (int, id, num, =, ;, $, ...). This module:
+symbols of the grammar (int, ID, INT, =, ;, $, ...). This module:
 
 1. Runs the existing lexer (no lexical analysis is duplicated here).
 2. Stops if the lexer reported any lexical error, so an invalid token
@@ -24,20 +24,23 @@ Each resulting `Terminal` keeps the original token, so the parser and the
 SDT module still have the lexeme, line and column for error messages and
 semantic attributes.
 
-Token -> terminal mapping
+Token -> terminal mapping (terminal names from the team's CLR(1) grammar,
+productions 0-50, issue #2)
 -------------------------
     KEYWORD      'int'      ->  int        (the keyword itself)
-    IDENTIFIER   'x'        ->  id
-    CONSTANT     '10'       ->  num        (integer and decimal constants)
-    LITERAL      'a'        ->  char_lit   (character literal)
-    LITERAL      "hi"       ->  string_lit (string literal)
+    IDENTIFIER   'main'     ->  main       (Program -> int main ( ) Block)
+    IDENTIFIER   'x'        ->  ID
+    CONSTANT     '10'       ->  INT        (integer constant)
+    CONSTANT     '3.5'      ->  FLOAT      (decimal constant)
+    LITERAL      'a'        ->  CHAR       (character literal)
+    LITERAL      "hi"       ->  STRING     (string literal)
     OPERATOR     '='        ->  =          (the operator itself)
     PUNCTUATION  ';'        ->  ;          (the punctuation itself)
     (end of input)          ->  $
 
-The names id, num, char_lit and string_lit are placeholders until the final
-grammar (issue #2) fixes the terminal names; they are defined only in the
-constants below, so renaming them is a one-line change.
+`main` stays an IDENTIFIER in the lexer (in C it is a function name, not a
+reserved word); only its grammar terminal is `main`, because the grammar
+expects that exact word after `int` in the program header.
 """
 
 from pathlib import Path
@@ -48,10 +51,12 @@ RESOURCES_DIR = Path(__file__).resolve().parents[2] / "resources"
 KEYWORDS_PATH = RESOURCES_DIR / "keywords.txt"
 
 # Grammar terminal names for the token categories whose lexeme varies.
-IDENTIFIER_TERMINAL = "id"
-CONSTANT_TERMINAL = "num"
-CHAR_LITERAL_TERMINAL = "char_lit"
-STRING_LITERAL_TERMINAL = "string_lit"
+IDENTIFIER_TERMINAL = "ID"
+INT_CONSTANT_TERMINAL = "INT"
+FLOAT_CONSTANT_TERMINAL = "FLOAT"
+CHAR_LITERAL_TERMINAL = "CHAR"
+STRING_LITERAL_TERMINAL = "STRING"
+MAIN_TERMINAL = "main"
 END_OF_INPUT = "$"
 
 # Categories whose terminal is the lexeme itself (int, while, +, ==, ;, {).
@@ -104,9 +109,15 @@ def to_terminal(token):
     if token.type in _LEXEME_IS_TERMINAL:
         return token.lexeme
     if token.type == "IDENTIFIER":
+        if token.lexeme == MAIN_TERMINAL:
+            return MAIN_TERMINAL
         return IDENTIFIER_TERMINAL
     if token.type == "CONSTANT":
-        return CONSTANT_TERMINAL
+        # The lexer only accepts digits or digits.digits, so a '.' is
+        # enough to tell a decimal constant from an integer one.
+        if "." in token.lexeme:
+            return FLOAT_CONSTANT_TERMINAL
+        return INT_CONSTANT_TERMINAL
     if token.type == "LITERAL":
         if token.lexeme.startswith("'"):
             return CHAR_LITERAL_TERMINAL
