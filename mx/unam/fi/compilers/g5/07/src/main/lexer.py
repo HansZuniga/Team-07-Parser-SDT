@@ -29,7 +29,7 @@ expresiones regulares" document (docs/Especificacion_Tokens.pdf):
     CONSTANT     [0-9]+(?:\.[0-9]+)?
     LITERAL      "[^"\r\n]*"                          (string literal)
                | '(?:[^'\\\r\n]|\\[ntr0\\'"])'         (character literal)
-    OPERATOR     ==|!=|<=|>=|[=+*/<>-]
+    OPERATOR     ==|!=|<=|>=|[=+*/%<>!-]
     PUNCTUATION  [(){};,]
 
 Whitespace (spaces, tabs) and newlines are not reported as tokens, but they
@@ -74,7 +74,9 @@ _LITERAL_RE = re.compile(r'"[^"\r\n]*"')
 # A character literal holds exactly one character or one simple escape
 # sequence: 'a', '7', ' ', '\n', '\t', '\r', '\0', '\\', '\'' or '\"'.
 _CHAR_LITERAL_RE = re.compile(r"""'(?:[^'\\\r\n]|\\[ntr0\\'"])'""")
-_OPERATOR_RE = re.compile(r"==|!=|<=|>=|[=+*/<>-]")
+# '%' (modulo) and '!' (logical not) are required by the CLR(1) grammar
+# (productions 39 and 43). '!=' is still matched first as one operator.
+_OPERATOR_RE = re.compile(r"==|!=|<=|>=|[=+*/%<>!-]")
 _PUNCTUATION_RE = re.compile(r"[(){};,]")
 
 

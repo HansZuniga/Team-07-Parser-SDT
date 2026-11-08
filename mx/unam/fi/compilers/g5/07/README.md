@@ -24,10 +24,12 @@ traduce cada token al terminal de la gramática:
 | Token del lexer          | Terminal     |
 |--------------------------|--------------|
 | `KEYWORD 'int'`          | `int`        |
-| `IDENTIFIER 'x'`         | `id`         |
-| `CONSTANT '10'`/`'3.5'`  | `num`        |
-| `LITERAL 'a'`            | `char_lit`   |
-| `LITERAL "hola"`         | `string_lit` |
+| `IDENTIFIER 'main'`      | `main`       |
+| `IDENTIFIER 'x'`         | `ID`         |
+| `CONSTANT '10'`          | `INT`        |
+| `CONSTANT '3.5'`         | `FLOAT`      |
+| `LITERAL 'a'`            | `CHAR`       |
+| `LITERAL "hola"`         | `STRING`     |
 | `OPERATOR '='`           | `=`          |
 | `PUNCTUATION ';'`        | `;`          |
 | fin de la entrada        | `$`          |
@@ -35,9 +37,11 @@ traduce cada token al terminal de la gramática:
 Cada `Terminal` conserva el token original (lexema, línea, columna) para los
 mensajes de error del parser y para el SDT.
 
-> Los nombres `id`, `num`, `char_lit` y `string_lit` son provisionales hasta
-> que quede la gramática final (issue #2). Se cambian en las constantes al
-> inicio de `token_stream.py`.
+> Los nombres de los terminales son los de la gramática CLR(1) del equipo
+> (producciones 0-50, issue #2). `main` sigue siendo `IDENTIFIER` en el
+> lexer (en C no es palabra reservada); solo su terminal es `main`, porque
+> la gramática lo espera en `int main ( ) Block`. El lexer reconoce además
+> los operadores `%` y `!` que usa la gramática.
 
 ```python
 from token_stream import tokenize_source, LexicalError
