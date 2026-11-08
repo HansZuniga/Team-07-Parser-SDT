@@ -1,0 +1,13 @@
+TEAM 07 - ENTREGA DE MODEL DESIGNER
+Brandon Yáñez Barajas
+
+PDF:
+01_Gramatica_y_Tokens.pdf: terminales, no terminales, producciones, precedencia y alcance.
+02_Coleccion_LR1.pdf: FIRST, CLOSURE, GOTO, 161 estados y 730 transiciones.
+03_ACTION_GOTO.pdf: tabla completa, interpretación de acciones y ejemplo de reconocimiento.
+04_Reglas_SDT.pdf: atributos, reglas por producción, tipos, ámbitos y tabla de símbolos.
+
+Datos/: gramática, FIRST, colección LR(1), transiciones y tabla ACTION/GOTO en JSON; transiciones y tabla también en CSV.
+LaTeX/: fuentes de los cuatro documentos, estilo y tabla de producciones.
+
+Las cuatro entregas usan las mismas producciones 0-50 y los mismos estados 0-160. Se mantiene CLR(1) y el cálculo de lookaheads mediante FIRST(beta a).

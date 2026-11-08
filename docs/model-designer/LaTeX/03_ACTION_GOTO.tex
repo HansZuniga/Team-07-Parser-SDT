@@ -1,0 +1,208 @@
+\input{estilo.tex}
+\begin{document}
+\titulo{3. Tabla CLR(1) ACTION/GOTO}
+\section*{Construcción}
+\begin{itemize}
+\item Si $\operatorname{GOTO}(I_i,t)=I_j$ y $t$ es terminal, colocar \texttt{s}j en ACTION[i,t].
+\item Si $[A\to\alpha\cdot,a]\in I_i$ y la producción es p$k\ne$p0, colocar \texttt{r}k solo en ACTION[i,a].
+\item Si $[\texttt{Start}\to\texttt{Program}\cdot,\$]\in I_i$, colocar ACCEPT en ACTION[i,\$]. No generar r0.
+\item Para cada transición con no terminal $A$, colocar su destino en GOTO[i,A]. Reunir acciones candidatas antes de comprobar conflictos; no sobrescribirlas.
+\end{itemize}
+Resultado: 509 SHIFT, 795 REDUCE, una ACCEPT y 221 entradas GOTO. Cero conflictos shift/reduce y reduce/reduce. ACTION tiene 32 columnas; GOTO usa los 18 no terminales originales, sin Start.
+\section*{Significado de las acciones y del árbol}
+\begin{itemize}
+\item \textbf{SHIFT s$j$:} reconoce el token actual y pasa al estado $j$. Ese token corresponde a una hoja del árbol, con su lexema, línea y columna.
+\item \textbf{REDUCE r$k$:} reconoce la parte derecha de la producción p$k$ como una instancia de su no terminal izquierdo. El siguiente token no se consume. La producción determina el padre y el orden de sus hijos en el árbol.
+\item \textbf{GOTO:} determina la transición con el no terminal reconocido mediante una reducción.
+\item \textbf{Producción vacía:} reconoce una parte derecha sin símbolos. Su nodo no tiene hijos y no consume tokens.
+\item \textbf{ACCEPT:} confirma que Program se reconoció completo y se alcanzó el fin de entrada. Program es la raíz del árbol sintáctico.
+\item \textbf{Celda ACTION ausente:} no existe una acción válida para ese estado y token; corresponde a un error sintáctico.
+\end{itemize}
+Las producciones intermedias también forman parte del árbol. Así se conserva la relación entre cada estructura reconocida y sus reglas semánticas. Para una producción no vacía, la posición del nodo corresponde al primer hijo; para una vacía, a la posición del siguiente token.
+
+Ejemplos: \texttt{ACTION[0,int]=s2}; \texttt{ACTION[28,;]=r12}; \texttt{GOTO[28,Init]=50}; \texttt{ACTION[1,\$]=acc}. En r12 se reconoce Init vacío y se conserva \texttt{;} como siguiente token.
+\clearpage
+\section*{Ejemplo de ejecución: declaración sin inicializador}
+La siguiente traza corresponde a \texttt{int main()\{int x;\}}. Inicia cuando ya se reconocieron la cabecera, la llave y la lista Items vacía. En cada fila se muestra la situación \emph{antes} de ejecutar la acción.
+
+{\small\begin{longtable}{@{}p{8.6cm}p{1.7cm}p{4.8cm}@{}}\toprule Pila de estados & Siguiente & Acción y efecto\\\midrule\endhead
+\texttt{[0,2,3,4,5,7,8]} & \texttt{int} & \texttt{s22}: Consume int.\\
+\texttt{[0,2,3,4,5,7,8,22]} & \texttt{ID} & \texttt{r8}: Type -> int; GOTO(8,Type)=17.\\
+\texttt{[0,2,3,4,5,7,8,17]} & \texttt{ID} & \texttt{s28}: Consume ID, cuyo lexema es x.\\
+\texttt{[0,2,3,4,5,7,8,17,28]} & \texttt{;} & \texttt{r12}: Init -> epsilon; GOTO(28,Init)=50.\\
+\texttt{[0,2,3,4,5,7,8,17,28,50]} & \texttt{;} & \texttt{s87}: Consume el punto y coma.\\
+\texttt{[0,2,3,4,5,7,8,17,28,50,87]} & \texttt{\}} & \texttt{r7}: Decl -> Type ID Init ;. Retira cuatro estados y consulta GOTO(8,Decl)=11.\\
+\bottomrule\end{longtable}}
+En r12 no se retira nada de las pilas y tampoco se consume \texttt{;}. Por eso la fila siguiente vuelve a consultar ese mismo token. En r7 se retiran Type, ID, Init y \texttt{;}; se crea un nodo Decl con esos cuatro hijos y se conserva el lexema de x en su hoja.
+
+El final del análisis reduce Block con p2 y Program con p1. Se llega a la pila \texttt{[0,1]} con el token \texttt{\$}; ACTION[1,\$] permite ACCEPT. El árbol resultante tiene Program como raíz.
+\section*{Interpretar una fila de la tabla}
+La entrada \texttt{r4 : ;, ID, char, ...} en I7 significa que cada uno de esos terminales tiene la misma reducción p4. No significa que se consuman todos. La entrada \texttt{Items : 8} está en GOTO, porque Items es un no terminal obtenido al reducir.
+
+Un conflicto shift/reduce existiría si una misma celda pidiera consumir el token y reducir. Un conflicto reduce/reduce existiría si dos producciones distintas pidieran reducir en esa celda. Registrar dos veces la misma acción no crea un conflicto. La tabla entregada no tiene celdas con acciones distintas en competencia.
+\clearpage
+\section*{Tabla completa}
+Cada par \texttt{acción : \{terminales\}} define esa acción en todas las columnas enumeradas de la fila. No agrega acciones a otras columnas.
+{\small\begin{longtable}{@{}r p{10.1cm}p{4.4cm}@{}}\toprule Estado & ACTION: acción : terminales & GOTO: no terminal : estado\\\midrule\endhead
+0 & \texttt{s2} : \texttt{int} & \texttt{Program}: 1\\\addlinespace[3pt]
+1 & \texttt{acc} : \texttt{\$} & --\\\addlinespace[3pt]
+2 & \texttt{s3} : \texttt{main} & --\\\addlinespace[3pt]
+3 & \texttt{s4} : \texttt{(} & --\\\addlinespace[3pt]
+4 & \texttt{s5} : \texttt{)} & --\\\addlinespace[3pt]
+5 & \texttt{s7} : \texttt{\{} & \texttt{Block}: 6\\\addlinespace[3pt]
+6 & \texttt{r1} : \texttt{\$} & --\\\addlinespace[3pt]
+7 & \texttt{r4} : \texttt{;, ID, char, float, if, int, return, while, \{, \}} & \texttt{Items}: 8\\\addlinespace[3pt]
+8 & \texttt{s12} : \texttt{ID}; \texttt{s19} : \texttt{char}; \texttt{s20} : \texttt{float}; \texttt{s21} : \texttt{if}; \texttt{s22} : \texttt{int}; \texttt{s23} : \texttt{return}; \texttt{s24} : \texttt{while}; \texttt{s25} : \texttt{\{}; \texttt{s26} : \texttt{\}}; \texttt{s9} : \texttt{;} & \texttt{Block}: 10; \texttt{Decl}: 11; \texttt{Item}: 13; \texttt{Matched}: 14; \texttt{Simple}: 15; \texttt{Stmt}: 16; \texttt{Type}: 17; \texttt{Unmatched}: 18\\\addlinespace[3pt]
+9 & \texttt{r24} : \texttt{;, ID, char, float, if, int, return, while, \{, \}} & --\\\addlinespace[3pt]
+10 & \texttt{r16} : \texttt{;, ID, char, float, if, int, return, while, \{, \}} & --\\\addlinespace[3pt]
+11 & \texttt{r5} : \texttt{;, ID, char, float, if, int, return, while, \{, \}} & --\\\addlinespace[3pt]
+12 & \texttt{s27} : \texttt{=} & --\\\addlinespace[3pt]
+13 & \texttt{r3} : \texttt{;, ID, char, float, if, int, return, while, \{, \}} & --\\\addlinespace[3pt]
+14 & \texttt{r13} : \texttt{;, ID, char, float, if, int, return, while, \{, \}} & --\\\addlinespace[3pt]
+15 & \texttt{r15} : \texttt{;, ID, char, float, if, int, return, while, \{, \}} & --\\\addlinespace[3pt]
+16 & \texttt{r6} : \texttt{;, ID, char, float, if, int, return, while, \{, \}} & --\\\addlinespace[3pt]
+17 & \texttt{s28} : \texttt{ID} & --\\\addlinespace[3pt]
+18 & \texttt{r14} : \texttt{;, ID, char, float, if, int, return, while, \{, \}} & --\\\addlinespace[3pt]
+19 & \texttt{r10} : \texttt{ID} & --\\\addlinespace[3pt]
+20 & \texttt{r9} : \texttt{ID} & --\\\addlinespace[3pt]
+21 & \texttt{s29} : \texttt{(} & --\\\addlinespace[3pt]
+22 & \texttt{r8} : \texttt{ID} & --\\\addlinespace[3pt]
+23 & \texttt{s30} : \texttt{!}; \texttt{s31} : \texttt{(}; \texttt{s32} : \texttt{+}; \texttt{s33} : \texttt{-}; \texttt{s35} : \texttt{CHAR}; \texttt{s38} : \texttt{FLOAT}; \texttt{s39} : \texttt{ID}; \texttt{s40} : \texttt{INT}; \texttt{s44} : \texttt{STRING} & \texttt{Add}: 34; \texttt{Equality}: 36; \texttt{Expr}: 37; \texttt{Mul}: 41; \texttt{Primary}: 42; \texttt{Relation}: 43; \texttt{Unary}: 45\\\addlinespace[3pt]
+24 & \texttt{s46} : \texttt{(} & --\\\addlinespace[3pt]
+25 & \texttt{r4} : \texttt{;, ID, char, float, if, int, return, while, \{, \}} & \texttt{Items}: 47\\\addlinespace[3pt]
+26 & \texttt{r2} : \texttt{\$} & --\\\addlinespace[3pt]
+27 & \texttt{s30} : \texttt{!}; \texttt{s31} : \texttt{(}; \texttt{s32} : \texttt{+}; \texttt{s33} : \texttt{-}; \texttt{s35} : \texttt{CHAR}; \texttt{s38} : \texttt{FLOAT}; \texttt{s39} : \texttt{ID}; \texttt{s40} : \texttt{INT}; \texttt{s44} : \texttt{STRING} & \texttt{Add}: 34; \texttt{Equality}: 36; \texttt{Expr}: 48; \texttt{Mul}: 41; \texttt{Primary}: 42; \texttt{Relation}: 43; \texttt{Unary}: 45\\\addlinespace[3pt]
+28 & \texttt{r12} : \texttt{;}; \texttt{s49} : \texttt{=} & \texttt{Init}: 50\\\addlinespace[3pt]
+29 & \texttt{s51} : \texttt{!}; \texttt{s52} : \texttt{(}; \texttt{s53} : \texttt{+}; \texttt{s54} : \texttt{-}; \texttt{s56} : \texttt{CHAR}; \texttt{s59} : \texttt{FLOAT}; \texttt{s60} : \texttt{ID}; \texttt{s61} : \texttt{INT}; \texttt{s65} : \texttt{STRING} & \texttt{Add}: 55; \texttt{Equality}: 57; \texttt{Expr}: 58; \texttt{Mul}: 62; \texttt{Primary}: 63; \texttt{Relation}: 64; \texttt{Unary}: 66\\\addlinespace[3pt]
+30 & \texttt{s30} : \texttt{!}; \texttt{s31} : \texttt{(}; \texttt{s32} : \texttt{+}; \texttt{s33} : \texttt{-}; \texttt{s35} : \texttt{CHAR}; \texttt{s38} : \texttt{FLOAT}; \texttt{s39} : \texttt{ID}; \texttt{s40} : \texttt{INT}; \texttt{s44} : \texttt{STRING} & \texttt{Primary}: 42; \texttt{Unary}: 67\\\addlinespace[3pt]
+31 & \texttt{s51} : \texttt{!}; \texttt{s52} : \texttt{(}; \texttt{s53} : \texttt{+}; \texttt{s54} : \texttt{-}; \texttt{s56} : \texttt{CHAR}; \texttt{s59} : \texttt{FLOAT}; \texttt{s60} : \texttt{ID}; \texttt{s61} : \texttt{INT}; \texttt{s65} : \texttt{STRING} & \texttt{Add}: 55; \texttt{Equality}: 57; \texttt{Expr}: 68; \texttt{Mul}: 62; \texttt{Primary}: 63; \texttt{Relation}: 64; \texttt{Unary}: 66\\\addlinespace[3pt]
+32 & \texttt{s30} : \texttt{!}; \texttt{s31} : \texttt{(}; \texttt{s32} : \texttt{+}; \texttt{s33} : \texttt{-}; \texttt{s35} : \texttt{CHAR}; \texttt{s38} : \texttt{FLOAT}; \texttt{s39} : \texttt{ID}; \texttt{s40} : \texttt{INT}; \texttt{s44} : \texttt{STRING} & \texttt{Primary}: 42; \texttt{Unary}: 69\\\addlinespace[3pt]
+33 & \texttt{s30} : \texttt{!}; \texttt{s31} : \texttt{(}; \texttt{s32} : \texttt{+}; \texttt{s33} : \texttt{-}; \texttt{s35} : \texttt{CHAR}; \texttt{s38} : \texttt{FLOAT}; \texttt{s39} : \texttt{ID}; \texttt{s40} : \texttt{INT}; \texttt{s44} : \texttt{STRING} & \texttt{Primary}: 42; \texttt{Unary}: 70\\\addlinespace[3pt]
+34 & \texttt{r33} : \texttt{!=, ;, \textless{}, \textless{}=, ==, \textgreater{}, \textgreater{}=}; \texttt{s71} : \texttt{+}; \texttt{s72} : \texttt{-} & --\\\addlinespace[3pt]
+35 & \texttt{r48} : \texttt{!=, \%, *, +, -, /, ;, \textless{}, \textless{}=, ==, \textgreater{}, \textgreater{}=} & --\\\addlinespace[3pt]
+36 & \texttt{r25} : \texttt{;}; \texttt{s73} : \texttt{!=}; \texttt{s74} : \texttt{==} & --\\\addlinespace[3pt]
+37 & \texttt{s75} : \texttt{;} & --\\\addlinespace[3pt]
+38 & \texttt{r47} : \texttt{!=, \%, *, +, -, /, ;, \textless{}, \textless{}=, ==, \textgreater{}, \textgreater{}=} & --\\\addlinespace[3pt]
+39 & \texttt{r45} : \texttt{!=, \%, *, +, -, /, ;, \textless{}, \textless{}=, ==, \textgreater{}, \textgreater{}=} & --\\\addlinespace[3pt]
+40 & \texttt{r46} : \texttt{!=, \%, *, +, -, /, ;, \textless{}, \textless{}=, ==, \textgreater{}, \textgreater{}=} & --\\\addlinespace[3pt]
+41 & \texttt{r36} : \texttt{!=, +, -, ;, \textless{}, \textless{}=, ==, \textgreater{}, \textgreater{}=}; \texttt{s76} : \texttt{\%}; \texttt{s77} : \texttt{*}; \texttt{s78} : \texttt{/} & --\\\addlinespace[3pt]
+42 & \texttt{r44} : \texttt{!=, \%, *, +, -, /, ;, \textless{}, \textless{}=, ==, \textgreater{}, \textgreater{}=} & --\\\addlinespace[3pt]
+43 & \texttt{r28} : \texttt{!=, ;, ==}; \texttt{s79} : \texttt{\textless{}}; \texttt{s80} : \texttt{\textless{}=}; \texttt{s81} : \texttt{\textgreater{}}; \texttt{s82} : \texttt{\textgreater{}=} & --\\\addlinespace[3pt]
+44 & \texttt{r49} : \texttt{!=, \%, *, +, -, /, ;, \textless{}, \textless{}=, ==, \textgreater{}, \textgreater{}=} & --\\\addlinespace[3pt]
+45 & \texttt{r40} : \texttt{!=, \%, *, +, -, /, ;, \textless{}, \textless{}=, ==, \textgreater{}, \textgreater{}=} & --\\\addlinespace[3pt]
+46 & \texttt{s51} : \texttt{!}; \texttt{s52} : \texttt{(}; \texttt{s53} : \texttt{+}; \texttt{s54} : \texttt{-}; \texttt{s56} : \texttt{CHAR}; \texttt{s59} : \texttt{FLOAT}; \texttt{s60} : \texttt{ID}; \texttt{s61} : \texttt{INT}; \texttt{s65} : \texttt{STRING} & \texttt{Add}: 55; \texttt{Equality}: 57; \texttt{Expr}: 83; \texttt{Mul}: 62; \texttt{Primary}: 63; \texttt{Relation}: 64; \texttt{Unary}: 66\\\addlinespace[3pt]
+47 & \texttt{s12} : \texttt{ID}; \texttt{s19} : \texttt{char}; \texttt{s20} : \texttt{float}; \texttt{s21} : \texttt{if}; \texttt{s22} : \texttt{int}; \texttt{s23} : \texttt{return}; \texttt{s24} : \texttt{while}; \texttt{s25} : \texttt{\{}; \texttt{s84} : \texttt{\}}; \texttt{s9} : \texttt{;} & \texttt{Block}: 10; \texttt{Decl}: 11; \texttt{Item}: 13; \texttt{Matched}: 14; \texttt{Simple}: 15; \texttt{Stmt}: 16; \texttt{Type}: 17; \texttt{Unmatched}: 18\\\addlinespace[3pt]
+48 & \texttt{s85} : \texttt{;} & --\\\addlinespace[3pt]
+49 & \texttt{s30} : \texttt{!}; \texttt{s31} : \texttt{(}; \texttt{s32} : \texttt{+}; \texttt{s33} : \texttt{-}; \texttt{s35} : \texttt{CHAR}; \texttt{s38} : \texttt{FLOAT}; \texttt{s39} : \texttt{ID}; \texttt{s40} : \texttt{INT}; \texttt{s44} : \texttt{STRING} & \texttt{Add}: 34; \texttt{Equality}: 36; \texttt{Expr}: 86; \texttt{Mul}: 41; \texttt{Primary}: 42; \texttt{Relation}: 43; \texttt{Unary}: 45\\\addlinespace[3pt]
+50 & \texttt{s87} : \texttt{;} & --\\\addlinespace[3pt]
+51 & \texttt{s51} : \texttt{!}; \texttt{s52} : \texttt{(}; \texttt{s53} : \texttt{+}; \texttt{s54} : \texttt{-}; \texttt{s56} : \texttt{CHAR}; \texttt{s59} : \texttt{FLOAT}; \texttt{s60} : \texttt{ID}; \texttt{s61} : \texttt{INT}; \texttt{s65} : \texttt{STRING} & \texttt{Primary}: 63; \texttt{Unary}: 88\\\addlinespace[3pt]
+52 & \texttt{s51} : \texttt{!}; \texttt{s52} : \texttt{(}; \texttt{s53} : \texttt{+}; \texttt{s54} : \texttt{-}; \texttt{s56} : \texttt{CHAR}; \texttt{s59} : \texttt{FLOAT}; \texttt{s60} : \texttt{ID}; \texttt{s61} : \texttt{INT}; \texttt{s65} : \texttt{STRING} & \texttt{Add}: 55; \texttt{Equality}: 57; \texttt{Expr}: 89; \texttt{Mul}: 62; \texttt{Primary}: 63; \texttt{Relation}: 64; \texttt{Unary}: 66\\\addlinespace[3pt]
+53 & \texttt{s51} : \texttt{!}; \texttt{s52} : \texttt{(}; \texttt{s53} : \texttt{+}; \texttt{s54} : \texttt{-}; \texttt{s56} : \texttt{CHAR}; \texttt{s59} : \texttt{FLOAT}; \texttt{s60} : \texttt{ID}; \texttt{s61} : \texttt{INT}; \texttt{s65} : \texttt{STRING} & \texttt{Primary}: 63; \texttt{Unary}: 90\\\addlinespace[3pt]
+54 & \texttt{s51} : \texttt{!}; \texttt{s52} : \texttt{(}; \texttt{s53} : \texttt{+}; \texttt{s54} : \texttt{-}; \texttt{s56} : \texttt{CHAR}; \texttt{s59} : \texttt{FLOAT}; \texttt{s60} : \texttt{ID}; \texttt{s61} : \texttt{INT}; \texttt{s65} : \texttt{STRING} & \texttt{Primary}: 63; \texttt{Unary}: 91\\\addlinespace[3pt]
+55 & \texttt{r33} : \texttt{!=, ), \textless{}, \textless{}=, ==, \textgreater{}, \textgreater{}=}; \texttt{s92} : \texttt{+}; \texttt{s93} : \texttt{-} & --\\\addlinespace[3pt]
+56 & \texttt{r48} : \texttt{!=, \%, ), *, +, -, /, \textless{}, \textless{}=, ==, \textgreater{}, \textgreater{}=} & --\\\addlinespace[3pt]
+57 & \texttt{r25} : \texttt{)}; \texttt{s94} : \texttt{!=}; \texttt{s95} : \texttt{==} & --\\\addlinespace[3pt]
+58 & \texttt{s96} : \texttt{)} & --\\\addlinespace[3pt]
+59 & \texttt{r47} : \texttt{!=, \%, ), *, +, -, /, \textless{}, \textless{}=, ==, \textgreater{}, \textgreater{}=} & --\\\addlinespace[3pt]
+60 & \texttt{r45} : \texttt{!=, \%, ), *, +, -, /, \textless{}, \textless{}=, ==, \textgreater{}, \textgreater{}=} & --\\\addlinespace[3pt]
+61 & \texttt{r46} : \texttt{!=, \%, ), *, +, -, /, \textless{}, \textless{}=, ==, \textgreater{}, \textgreater{}=} & --\\\addlinespace[3pt]
+62 & \texttt{r36} : \texttt{!=, ), +, -, \textless{}, \textless{}=, ==, \textgreater{}, \textgreater{}=}; \texttt{s97} : \texttt{\%}; \texttt{s98} : \texttt{*}; \texttt{s99} : \texttt{/} & --\\\addlinespace[3pt]
+63 & \texttt{r44} : \texttt{!=, \%, ), *, +, -, /, \textless{}, \textless{}=, ==, \textgreater{}, \textgreater{}=} & --\\\addlinespace[3pt]
+64 & \texttt{r28} : \texttt{!=, ), ==}; \texttt{s100} : \texttt{\textless{}}; \texttt{s101} : \texttt{\textless{}=}; \texttt{s102} : \texttt{\textgreater{}}; \texttt{s103} : \texttt{\textgreater{}=} & --\\\addlinespace[3pt]
+65 & \texttt{r49} : \texttt{!=, \%, ), *, +, -, /, \textless{}, \textless{}=, ==, \textgreater{}, \textgreater{}=} & --\\\addlinespace[3pt]
+66 & \texttt{r40} : \texttt{!=, \%, ), *, +, -, /, \textless{}, \textless{}=, ==, \textgreater{}, \textgreater{}=} & --\\\addlinespace[3pt]
+67 & \texttt{r43} : \texttt{!=, \%, *, +, -, /, ;, \textless{}, \textless{}=, ==, \textgreater{}, \textgreater{}=} & --\\\addlinespace[3pt]
+68 & \texttt{s104} : \texttt{)} & --\\\addlinespace[3pt]
+69 & \texttt{r41} : \texttt{!=, \%, *, +, -, /, ;, \textless{}, \textless{}=, ==, \textgreater{}, \textgreater{}=} & --\\\addlinespace[3pt]
+70 & \texttt{r42} : \texttt{!=, \%, *, +, -, /, ;, \textless{}, \textless{}=, ==, \textgreater{}, \textgreater{}=} & --\\\addlinespace[3pt]
+71 & \texttt{s30} : \texttt{!}; \texttt{s31} : \texttt{(}; \texttt{s32} : \texttt{+}; \texttt{s33} : \texttt{-}; \texttt{s35} : \texttt{CHAR}; \texttt{s38} : \texttt{FLOAT}; \texttt{s39} : \texttt{ID}; \texttt{s40} : \texttt{INT}; \texttt{s44} : \texttt{STRING} & \texttt{Mul}: 105; \texttt{Primary}: 42; \texttt{Unary}: 45\\\addlinespace[3pt]
+72 & \texttt{s30} : \texttt{!}; \texttt{s31} : \texttt{(}; \texttt{s32} : \texttt{+}; \texttt{s33} : \texttt{-}; \texttt{s35} : \texttt{CHAR}; \texttt{s38} : \texttt{FLOAT}; \texttt{s39} : \texttt{ID}; \texttt{s40} : \texttt{INT}; \texttt{s44} : \texttt{STRING} & \texttt{Mul}: 106; \texttt{Primary}: 42; \texttt{Unary}: 45\\\addlinespace[3pt]
+73 & \texttt{s30} : \texttt{!}; \texttt{s31} : \texttt{(}; \texttt{s32} : \texttt{+}; \texttt{s33} : \texttt{-}; \texttt{s35} : \texttt{CHAR}; \texttt{s38} : \texttt{FLOAT}; \texttt{s39} : \texttt{ID}; \texttt{s40} : \texttt{INT}; \texttt{s44} : \texttt{STRING} & \texttt{Add}: 34; \texttt{Mul}: 41; \texttt{Primary}: 42; \texttt{Relation}: 107; \texttt{Unary}: 45\\\addlinespace[3pt]
+74 & \texttt{s30} : \texttt{!}; \texttt{s31} : \texttt{(}; \texttt{s32} : \texttt{+}; \texttt{s33} : \texttt{-}; \texttt{s35} : \texttt{CHAR}; \texttt{s38} : \texttt{FLOAT}; \texttt{s39} : \texttt{ID}; \texttt{s40} : \texttt{INT}; \texttt{s44} : \texttt{STRING} & \texttt{Add}: 34; \texttt{Mul}: 41; \texttt{Primary}: 42; \texttt{Relation}: 108; \texttt{Unary}: 45\\\addlinespace[3pt]
+75 & \texttt{r23} : \texttt{;, ID, char, float, if, int, return, while, \{, \}} & --\\\addlinespace[3pt]
+76 & \texttt{s30} : \texttt{!}; \texttt{s31} : \texttt{(}; \texttt{s32} : \texttt{+}; \texttt{s33} : \texttt{-}; \texttt{s35} : \texttt{CHAR}; \texttt{s38} : \texttt{FLOAT}; \texttt{s39} : \texttt{ID}; \texttt{s40} : \texttt{INT}; \texttt{s44} : \texttt{STRING} & \texttt{Primary}: 42; \texttt{Unary}: 109\\\addlinespace[3pt]
+77 & \texttt{s30} : \texttt{!}; \texttt{s31} : \texttt{(}; \texttt{s32} : \texttt{+}; \texttt{s33} : \texttt{-}; \texttt{s35} : \texttt{CHAR}; \texttt{s38} : \texttt{FLOAT}; \texttt{s39} : \texttt{ID}; \texttt{s40} : \texttt{INT}; \texttt{s44} : \texttt{STRING} & \texttt{Primary}: 42; \texttt{Unary}: 110\\\addlinespace[3pt]
+78 & \texttt{s30} : \texttt{!}; \texttt{s31} : \texttt{(}; \texttt{s32} : \texttt{+}; \texttt{s33} : \texttt{-}; \texttt{s35} : \texttt{CHAR}; \texttt{s38} : \texttt{FLOAT}; \texttt{s39} : \texttt{ID}; \texttt{s40} : \texttt{INT}; \texttt{s44} : \texttt{STRING} & \texttt{Primary}: 42; \texttt{Unary}: 111\\\addlinespace[3pt]
+79 & \texttt{s30} : \texttt{!}; \texttt{s31} : \texttt{(}; \texttt{s32} : \texttt{+}; \texttt{s33} : \texttt{-}; \texttt{s35} : \texttt{CHAR}; \texttt{s38} : \texttt{FLOAT}; \texttt{s39} : \texttt{ID}; \texttt{s40} : \texttt{INT}; \texttt{s44} : \texttt{STRING} & \texttt{Add}: 112; \texttt{Mul}: 41; \texttt{Primary}: 42; \texttt{Unary}: 45\\\addlinespace[3pt]
+80 & \texttt{s30} : \texttt{!}; \texttt{s31} : \texttt{(}; \texttt{s32} : \texttt{+}; \texttt{s33} : \texttt{-}; \texttt{s35} : \texttt{CHAR}; \texttt{s38} : \texttt{FLOAT}; \texttt{s39} : \texttt{ID}; \texttt{s40} : \texttt{INT}; \texttt{s44} : \texttt{STRING} & \texttt{Add}: 113; \texttt{Mul}: 41; \texttt{Primary}: 42; \texttt{Unary}: 45\\\addlinespace[3pt]
+81 & \texttt{s30} : \texttt{!}; \texttt{s31} : \texttt{(}; \texttt{s32} : \texttt{+}; \texttt{s33} : \texttt{-}; \texttt{s35} : \texttt{CHAR}; \texttt{s38} : \texttt{FLOAT}; \texttt{s39} : \texttt{ID}; \texttt{s40} : \texttt{INT}; \texttt{s44} : \texttt{STRING} & \texttt{Add}: 114; \texttt{Mul}: 41; \texttt{Primary}: 42; \texttt{Unary}: 45\\\addlinespace[3pt]
+82 & \texttt{s30} : \texttt{!}; \texttt{s31} : \texttt{(}; \texttt{s32} : \texttt{+}; \texttt{s33} : \texttt{-}; \texttt{s35} : \texttt{CHAR}; \texttt{s38} : \texttt{FLOAT}; \texttt{s39} : \texttt{ID}; \texttt{s40} : \texttt{INT}; \texttt{s44} : \texttt{STRING} & \texttt{Add}: 115; \texttt{Mul}: 41; \texttt{Primary}: 42; \texttt{Unary}: 45\\\addlinespace[3pt]
+83 & \texttt{s116} : \texttt{)} & --\\\addlinespace[3pt]
+84 & \texttt{r2} : \texttt{;, ID, char, float, if, int, return, while, \{, \}} & --\\\addlinespace[3pt]
+85 & \texttt{r22} : \texttt{;, ID, char, float, if, int, return, while, \{, \}} & --\\\addlinespace[3pt]
+86 & \texttt{r11} : \texttt{;} & --\\\addlinespace[3pt]
+87 & \texttt{r7} : \texttt{;, ID, char, float, if, int, return, while, \{, \}} & --\\\addlinespace[3pt]
+88 & \texttt{r43} : \texttt{!=, \%, ), *, +, -, /, \textless{}, \textless{}=, ==, \textgreater{}, \textgreater{}=} & --\\\addlinespace[3pt]
+89 & \texttt{s117} : \texttt{)} & --\\\addlinespace[3pt]
+90 & \texttt{r41} : \texttt{!=, \%, ), *, +, -, /, \textless{}, \textless{}=, ==, \textgreater{}, \textgreater{}=} & --\\\addlinespace[3pt]
+91 & \texttt{r42} : \texttt{!=, \%, ), *, +, -, /, \textless{}, \textless{}=, ==, \textgreater{}, \textgreater{}=} & --\\\addlinespace[3pt]
+92 & \texttt{s51} : \texttt{!}; \texttt{s52} : \texttt{(}; \texttt{s53} : \texttt{+}; \texttt{s54} : \texttt{-}; \texttt{s56} : \texttt{CHAR}; \texttt{s59} : \texttt{FLOAT}; \texttt{s60} : \texttt{ID}; \texttt{s61} : \texttt{INT}; \texttt{s65} : \texttt{STRING} & \texttt{Mul}: 118; \texttt{Primary}: 63; \texttt{Unary}: 66\\\addlinespace[3pt]
+93 & \texttt{s51} : \texttt{!}; \texttt{s52} : \texttt{(}; \texttt{s53} : \texttt{+}; \texttt{s54} : \texttt{-}; \texttt{s56} : \texttt{CHAR}; \texttt{s59} : \texttt{FLOAT}; \texttt{s60} : \texttt{ID}; \texttt{s61} : \texttt{INT}; \texttt{s65} : \texttt{STRING} & \texttt{Mul}: 119; \texttt{Primary}: 63; \texttt{Unary}: 66\\\addlinespace[3pt]
+94 & \texttt{s51} : \texttt{!}; \texttt{s52} : \texttt{(}; \texttt{s53} : \texttt{+}; \texttt{s54} : \texttt{-}; \texttt{s56} : \texttt{CHAR}; \texttt{s59} : \texttt{FLOAT}; \texttt{s60} : \texttt{ID}; \texttt{s61} : \texttt{INT}; \texttt{s65} : \texttt{STRING} & \texttt{Add}: 55; \texttt{Mul}: 62; \texttt{Primary}: 63; \texttt{Relation}: 120; \texttt{Unary}: 66\\\addlinespace[3pt]
+95 & \texttt{s51} : \texttt{!}; \texttt{s52} : \texttt{(}; \texttt{s53} : \texttt{+}; \texttt{s54} : \texttt{-}; \texttt{s56} : \texttt{CHAR}; \texttt{s59} : \texttt{FLOAT}; \texttt{s60} : \texttt{ID}; \texttt{s61} : \texttt{INT}; \texttt{s65} : \texttt{STRING} & \texttt{Add}: 55; \texttt{Mul}: 62; \texttt{Primary}: 63; \texttt{Relation}: 121; \texttt{Unary}: 66\\\addlinespace[3pt]
+96 & \texttt{s122} : \texttt{;}; \texttt{s124} : \texttt{ID}; \texttt{s128} : \texttt{if}; \texttt{s129} : \texttt{return}; \texttt{s130} : \texttt{while}; \texttt{s131} : \texttt{\{} & \texttt{Block}: 123; \texttt{Matched}: 125; \texttt{Simple}: 126; \texttt{Stmt}: 127; \texttt{Unmatched}: 18\\\addlinespace[3pt]
+97 & \texttt{s51} : \texttt{!}; \texttt{s52} : \texttt{(}; \texttt{s53} : \texttt{+}; \texttt{s54} : \texttt{-}; \texttt{s56} : \texttt{CHAR}; \texttt{s59} : \texttt{FLOAT}; \texttt{s60} : \texttt{ID}; \texttt{s61} : \texttt{INT}; \texttt{s65} : \texttt{STRING} & \texttt{Primary}: 63; \texttt{Unary}: 132\\\addlinespace[3pt]
+98 & \texttt{s51} : \texttt{!}; \texttt{s52} : \texttt{(}; \texttt{s53} : \texttt{+}; \texttt{s54} : \texttt{-}; \texttt{s56} : \texttt{CHAR}; \texttt{s59} : \texttt{FLOAT}; \texttt{s60} : \texttt{ID}; \texttt{s61} : \texttt{INT}; \texttt{s65} : \texttt{STRING} & \texttt{Primary}: 63; \texttt{Unary}: 133\\\addlinespace[3pt]
+99 & \texttt{s51} : \texttt{!}; \texttt{s52} : \texttt{(}; \texttt{s53} : \texttt{+}; \texttt{s54} : \texttt{-}; \texttt{s56} : \texttt{CHAR}; \texttt{s59} : \texttt{FLOAT}; \texttt{s60} : \texttt{ID}; \texttt{s61} : \texttt{INT}; \texttt{s65} : \texttt{STRING} & \texttt{Primary}: 63; \texttt{Unary}: 134\\\addlinespace[3pt]
+100 & \texttt{s51} : \texttt{!}; \texttt{s52} : \texttt{(}; \texttt{s53} : \texttt{+}; \texttt{s54} : \texttt{-}; \texttt{s56} : \texttt{CHAR}; \texttt{s59} : \texttt{FLOAT}; \texttt{s60} : \texttt{ID}; \texttt{s61} : \texttt{INT}; \texttt{s65} : \texttt{STRING} & \texttt{Add}: 135; \texttt{Mul}: 62; \texttt{Primary}: 63; \texttt{Unary}: 66\\\addlinespace[3pt]
+101 & \texttt{s51} : \texttt{!}; \texttt{s52} : \texttt{(}; \texttt{s53} : \texttt{+}; \texttt{s54} : \texttt{-}; \texttt{s56} : \texttt{CHAR}; \texttt{s59} : \texttt{FLOAT}; \texttt{s60} : \texttt{ID}; \texttt{s61} : \texttt{INT}; \texttt{s65} : \texttt{STRING} & \texttt{Add}: 136; \texttt{Mul}: 62; \texttt{Primary}: 63; \texttt{Unary}: 66\\\addlinespace[3pt]
+102 & \texttt{s51} : \texttt{!}; \texttt{s52} : \texttt{(}; \texttt{s53} : \texttt{+}; \texttt{s54} : \texttt{-}; \texttt{s56} : \texttt{CHAR}; \texttt{s59} : \texttt{FLOAT}; \texttt{s60} : \texttt{ID}; \texttt{s61} : \texttt{INT}; \texttt{s65} : \texttt{STRING} & \texttt{Add}: 137; \texttt{Mul}: 62; \texttt{Primary}: 63; \texttt{Unary}: 66\\\addlinespace[3pt]
+103 & \texttt{s51} : \texttt{!}; \texttt{s52} : \texttt{(}; \texttt{s53} : \texttt{+}; \texttt{s54} : \texttt{-}; \texttt{s56} : \texttt{CHAR}; \texttt{s59} : \texttt{FLOAT}; \texttt{s60} : \texttt{ID}; \texttt{s61} : \texttt{INT}; \texttt{s65} : \texttt{STRING} & \texttt{Add}: 138; \texttt{Mul}: 62; \texttt{Primary}: 63; \texttt{Unary}: 66\\\addlinespace[3pt]
+104 & \texttt{r50} : \texttt{!=, \%, *, +, -, /, ;, \textless{}, \textless{}=, ==, \textgreater{}, \textgreater{}=} & --\\\addlinespace[3pt]
+105 & \texttt{r34} : \texttt{!=, +, -, ;, \textless{}, \textless{}=, ==, \textgreater{}, \textgreater{}=}; \texttt{s76} : \texttt{\%}; \texttt{s77} : \texttt{*}; \texttt{s78} : \texttt{/} & --\\\addlinespace[3pt]
+106 & \texttt{r35} : \texttt{!=, +, -, ;, \textless{}, \textless{}=, ==, \textgreater{}, \textgreater{}=}; \texttt{s76} : \texttt{\%}; \texttt{s77} : \texttt{*}; \texttt{s78} : \texttt{/} & --\\\addlinespace[3pt]
+107 & \texttt{r27} : \texttt{!=, ;, ==}; \texttt{s79} : \texttt{\textless{}}; \texttt{s80} : \texttt{\textless{}=}; \texttt{s81} : \texttt{\textgreater{}}; \texttt{s82} : \texttt{\textgreater{}=} & --\\\addlinespace[3pt]
+108 & \texttt{r26} : \texttt{!=, ;, ==}; \texttt{s79} : \texttt{\textless{}}; \texttt{s80} : \texttt{\textless{}=}; \texttt{s81} : \texttt{\textgreater{}}; \texttt{s82} : \texttt{\textgreater{}=} & --\\\addlinespace[3pt]
+109 & \texttt{r39} : \texttt{!=, \%, *, +, -, /, ;, \textless{}, \textless{}=, ==, \textgreater{}, \textgreater{}=} & --\\\addlinespace[3pt]
+110 & \texttt{r37} : \texttt{!=, \%, *, +, -, /, ;, \textless{}, \textless{}=, ==, \textgreater{}, \textgreater{}=} & --\\\addlinespace[3pt]
+111 & \texttt{r38} : \texttt{!=, \%, *, +, -, /, ;, \textless{}, \textless{}=, ==, \textgreater{}, \textgreater{}=} & --\\\addlinespace[3pt]
+112 & \texttt{r29} : \texttt{!=, ;, \textless{}, \textless{}=, ==, \textgreater{}, \textgreater{}=}; \texttt{s71} : \texttt{+}; \texttt{s72} : \texttt{-} & --\\\addlinespace[3pt]
+113 & \texttt{r30} : \texttt{!=, ;, \textless{}, \textless{}=, ==, \textgreater{}, \textgreater{}=}; \texttt{s71} : \texttt{+}; \texttt{s72} : \texttt{-} & --\\\addlinespace[3pt]
+114 & \texttt{r31} : \texttt{!=, ;, \textless{}, \textless{}=, ==, \textgreater{}, \textgreater{}=}; \texttt{s71} : \texttt{+}; \texttt{s72} : \texttt{-} & --\\\addlinespace[3pt]
+115 & \texttt{r32} : \texttt{!=, ;, \textless{}, \textless{}=, ==, \textgreater{}, \textgreater{}=}; \texttt{s71} : \texttt{+}; \texttt{s72} : \texttt{-} & --\\\addlinespace[3pt]
+116 & \texttt{s12} : \texttt{ID}; \texttt{s21} : \texttt{if}; \texttt{s23} : \texttt{return}; \texttt{s24} : \texttt{while}; \texttt{s25} : \texttt{\{}; \texttt{s9} : \texttt{;} & \texttt{Block}: 10; \texttt{Matched}: 139; \texttt{Simple}: 15; \texttt{Unmatched}: 140\\\addlinespace[3pt]
+117 & \texttt{r50} : \texttt{!=, \%, ), *, +, -, /, \textless{}, \textless{}=, ==, \textgreater{}, \textgreater{}=} & --\\\addlinespace[3pt]
+118 & \texttt{r34} : \texttt{!=, ), +, -, \textless{}, \textless{}=, ==, \textgreater{}, \textgreater{}=}; \texttt{s97} : \texttt{\%}; \texttt{s98} : \texttt{*}; \texttt{s99} : \texttt{/} & --\\\addlinespace[3pt]
+119 & \texttt{r35} : \texttt{!=, ), +, -, \textless{}, \textless{}=, ==, \textgreater{}, \textgreater{}=}; \texttt{s97} : \texttt{\%}; \texttt{s98} : \texttt{*}; \texttt{s99} : \texttt{/} & --\\\addlinespace[3pt]
+120 & \texttt{r27} : \texttt{!=, ), ==}; \texttt{s100} : \texttt{\textless{}}; \texttt{s101} : \texttt{\textless{}=}; \texttt{s102} : \texttt{\textgreater{}}; \texttt{s103} : \texttt{\textgreater{}=} & --\\\addlinespace[3pt]
+121 & \texttt{r26} : \texttt{!=, ), ==}; \texttt{s100} : \texttt{\textless{}}; \texttt{s101} : \texttt{\textless{}=}; \texttt{s102} : \texttt{\textgreater{}}; \texttt{s103} : \texttt{\textgreater{}=} & --\\\addlinespace[3pt]
+122 & \texttt{r24} : \texttt{;, ID, char, else, float, if, int, return, while, \{, \}} & --\\\addlinespace[3pt]
+123 & \texttt{r16} : \texttt{;, ID, char, else, float, if, int, return, while, \{, \}} & --\\\addlinespace[3pt]
+124 & \texttt{s141} : \texttt{=} & --\\\addlinespace[3pt]
+125 & \texttt{r13} : \texttt{;, ID, char, float, if, int, return, while, \{, \}}; \texttt{s142} : \texttt{else} & --\\\addlinespace[3pt]
+126 & \texttt{r15} : \texttt{;, ID, char, else, float, if, int, return, while, \{, \}} & --\\\addlinespace[3pt]
+127 & \texttt{r19} : \texttt{;, ID, char, float, if, int, return, while, \{, \}} & --\\\addlinespace[3pt]
+128 & \texttt{s143} : \texttt{(} & --\\\addlinespace[3pt]
+129 & \texttt{s30} : \texttt{!}; \texttt{s31} : \texttt{(}; \texttt{s32} : \texttt{+}; \texttt{s33} : \texttt{-}; \texttt{s35} : \texttt{CHAR}; \texttt{s38} : \texttt{FLOAT}; \texttt{s39} : \texttt{ID}; \texttt{s40} : \texttt{INT}; \texttt{s44} : \texttt{STRING} & \texttt{Add}: 34; \texttt{Equality}: 36; \texttt{Expr}: 144; \texttt{Mul}: 41; \texttt{Primary}: 42; \texttt{Relation}: 43; \texttt{Unary}: 45\\\addlinespace[3pt]
+130 & \texttt{s145} : \texttt{(} & --\\\addlinespace[3pt]
+131 & \texttt{r4} : \texttt{;, ID, char, float, if, int, return, while, \{, \}} & \texttt{Items}: 146\\\addlinespace[3pt]
+132 & \texttt{r39} : \texttt{!=, \%, ), *, +, -, /, \textless{}, \textless{}=, ==, \textgreater{}, \textgreater{}=} & --\\\addlinespace[3pt]
+133 & \texttt{r37} : \texttt{!=, \%, ), *, +, -, /, \textless{}, \textless{}=, ==, \textgreater{}, \textgreater{}=} & --\\\addlinespace[3pt]
+134 & \texttt{r38} : \texttt{!=, \%, ), *, +, -, /, \textless{}, \textless{}=, ==, \textgreater{}, \textgreater{}=} & --\\\addlinespace[3pt]
+135 & \texttt{r29} : \texttt{!=, ), \textless{}, \textless{}=, ==, \textgreater{}, \textgreater{}=}; \texttt{s92} : \texttt{+}; \texttt{s93} : \texttt{-} & --\\\addlinespace[3pt]
+136 & \texttt{r30} : \texttt{!=, ), \textless{}, \textless{}=, ==, \textgreater{}, \textgreater{}=}; \texttt{s92} : \texttt{+}; \texttt{s93} : \texttt{-} & --\\\addlinespace[3pt]
+137 & \texttt{r31} : \texttt{!=, ), \textless{}, \textless{}=, ==, \textgreater{}, \textgreater{}=}; \texttt{s92} : \texttt{+}; \texttt{s93} : \texttt{-} & --\\\addlinespace[3pt]
+138 & \texttt{r32} : \texttt{!=, ), \textless{}, \textless{}=, ==, \textgreater{}, \textgreater{}=}; \texttt{s92} : \texttt{+}; \texttt{s93} : \texttt{-} & --\\\addlinespace[3pt]
+139 & \texttt{r18} : \texttt{;, ID, char, float, if, int, return, while, \{, \}} & --\\\addlinespace[3pt]
+140 & \texttt{r21} : \texttt{;, ID, char, float, if, int, return, while, \{, \}} & --\\\addlinespace[3pt]
+141 & \texttt{s30} : \texttt{!}; \texttt{s31} : \texttt{(}; \texttt{s32} : \texttt{+}; \texttt{s33} : \texttt{-}; \texttt{s35} : \texttt{CHAR}; \texttt{s38} : \texttt{FLOAT}; \texttt{s39} : \texttt{ID}; \texttt{s40} : \texttt{INT}; \texttt{s44} : \texttt{STRING} & \texttt{Add}: 34; \texttt{Equality}: 36; \texttt{Expr}: 147; \texttt{Mul}: 41; \texttt{Primary}: 42; \texttt{Relation}: 43; \texttt{Unary}: 45\\\addlinespace[3pt]
+142 & \texttt{s12} : \texttt{ID}; \texttt{s21} : \texttt{if}; \texttt{s23} : \texttt{return}; \texttt{s24} : \texttt{while}; \texttt{s25} : \texttt{\{}; \texttt{s9} : \texttt{;} & \texttt{Block}: 10; \texttt{Matched}: 148; \texttt{Simple}: 15; \texttt{Unmatched}: 149\\\addlinespace[3pt]
+143 & \texttt{s51} : \texttt{!}; \texttt{s52} : \texttt{(}; \texttt{s53} : \texttt{+}; \texttt{s54} : \texttt{-}; \texttt{s56} : \texttt{CHAR}; \texttt{s59} : \texttt{FLOAT}; \texttt{s60} : \texttt{ID}; \texttt{s61} : \texttt{INT}; \texttt{s65} : \texttt{STRING} & \texttt{Add}: 55; \texttt{Equality}: 57; \texttt{Expr}: 150; \texttt{Mul}: 62; \texttt{Primary}: 63; \texttt{Relation}: 64; \texttt{Unary}: 66\\\addlinespace[3pt]
+144 & \texttt{s151} : \texttt{;} & --\\\addlinespace[3pt]
+145 & \texttt{s51} : \texttt{!}; \texttt{s52} : \texttt{(}; \texttt{s53} : \texttt{+}; \texttt{s54} : \texttt{-}; \texttt{s56} : \texttt{CHAR}; \texttt{s59} : \texttt{FLOAT}; \texttt{s60} : \texttt{ID}; \texttt{s61} : \texttt{INT}; \texttt{s65} : \texttt{STRING} & \texttt{Add}: 55; \texttt{Equality}: 57; \texttt{Expr}: 152; \texttt{Mul}: 62; \texttt{Primary}: 63; \texttt{Relation}: 64; \texttt{Unary}: 66\\\addlinespace[3pt]
+146 & \texttt{s12} : \texttt{ID}; \texttt{s153} : \texttt{\}}; \texttt{s19} : \texttt{char}; \texttt{s20} : \texttt{float}; \texttt{s21} : \texttt{if}; \texttt{s22} : \texttt{int}; \texttt{s23} : \texttt{return}; \texttt{s24} : \texttt{while}; \texttt{s25} : \texttt{\{}; \texttt{s9} : \texttt{;} & \texttt{Block}: 10; \texttt{Decl}: 11; \texttt{Item}: 13; \texttt{Matched}: 14; \texttt{Simple}: 15; \texttt{Stmt}: 16; \texttt{Type}: 17; \texttt{Unmatched}: 18\\\addlinespace[3pt]
+147 & \texttt{s154} : \texttt{;} & --\\\addlinespace[3pt]
+148 & \texttt{r17} : \texttt{;, ID, char, float, if, int, return, while, \{, \}} & --\\\addlinespace[3pt]
+149 & \texttt{r20} : \texttt{;, ID, char, float, if, int, return, while, \{, \}} & --\\\addlinespace[3pt]
+150 & \texttt{s155} : \texttt{)} & --\\\addlinespace[3pt]
+151 & \texttt{r23} : \texttt{;, ID, char, else, float, if, int, return, while, \{, \}} & --\\\addlinespace[3pt]
+152 & \texttt{s156} : \texttt{)} & --\\\addlinespace[3pt]
+153 & \texttt{r2} : \texttt{;, ID, char, else, float, if, int, return, while, \{, \}} & --\\\addlinespace[3pt]
+154 & \texttt{r22} : \texttt{;, ID, char, else, float, if, int, return, while, \{, \}} & --\\\addlinespace[3pt]
+155 & \texttt{s122} : \texttt{;}; \texttt{s124} : \texttt{ID}; \texttt{s128} : \texttt{if}; \texttt{s129} : \texttt{return}; \texttt{s130} : \texttt{while}; \texttt{s131} : \texttt{\{} & \texttt{Block}: 123; \texttt{Matched}: 157; \texttt{Simple}: 126; \texttt{Stmt}: 127; \texttt{Unmatched}: 18\\\addlinespace[3pt]
+156 & \texttt{s122} : \texttt{;}; \texttt{s124} : \texttt{ID}; \texttt{s128} : \texttt{if}; \texttt{s129} : \texttt{return}; \texttt{s130} : \texttt{while}; \texttt{s131} : \texttt{\{} & \texttt{Block}: 123; \texttt{Matched}: 158; \texttt{Simple}: 126; \texttt{Unmatched}: 140\\\addlinespace[3pt]
+157 & \texttt{r13} : \texttt{;, ID, char, float, if, int, return, while, \{, \}}; \texttt{s159} : \texttt{else} & --\\\addlinespace[3pt]
+158 & \texttt{r18} : \texttt{;, ID, char, else, float, if, int, return, while, \{, \}} & --\\\addlinespace[3pt]
+159 & \texttt{s122} : \texttt{;}; \texttt{s124} : \texttt{ID}; \texttt{s128} : \texttt{if}; \texttt{s129} : \texttt{return}; \texttt{s130} : \texttt{while}; \texttt{s131} : \texttt{\{} & \texttt{Block}: 123; \texttt{Matched}: 160; \texttt{Simple}: 126; \texttt{Unmatched}: 149\\\addlinespace[3pt]
+160 & \texttt{r17} : \texttt{;, ID, char, else, float, if, int, return, while, \{, \}} & --\\\addlinespace[3pt]
+\bottomrule\end{longtable}}\end{document}

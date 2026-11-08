@@ -1,0 +1,66 @@
+\input{estilo.tex}
+\begin{document}
+\titulo{1. Gramática y símbolos de entrada}
+\textbf{Unidad de análisis:} \texttt{int main() Block}. Se conservan las producciones 0--50 y la numeración de los 161 estados CLR(1).
+\section*{Terminales y normalización}
+La entrada está formada por tokens del lexer anterior. Cada token conserva \texttt{type}, \texttt{lexeme}, \texttt{line} y \texttt{column}. La etiqueta gramatical normalizada es \texttt{terminal}. El parser trabaja con tokens, no con caracteres sueltos.
+
+\begin{tabularx}{\linewidth}{@{}p{4cm}X@{}}\toprule Entrada del lexer & Terminal del parser\\\midrule
+Palabra clave admitida & Su lexema: \texttt{int, float, char, if, else, while, return}.\\
+Identificador & \texttt{ID}; el lexema \texttt{main} se normaliza como \texttt{main}.\\
+Operador o puntuación & Su lexema completo: \texttt{==} no se forma uniendo dos tokens \texttt{=}.\\
+Constante válida & \texttt{INT, FLOAT, CHAR, STRING}, según su clase léxica.\\
+Fin de entrada & \texttt{\$}, una sola vez. Un error léxico bloquea el parser.\\\bottomrule\end{tabularx}
+
+Los 31 terminales del lenguaje son:
+\texttt{! != \% ( ) * + - / ; \textless{} \textless{}= = == \textgreater{} \textgreater{}= CHAR FLOAT ID INT STRING char else float if int main return while \{ \}}.
+\texttt{int} es una palabra clave; \texttt{INT}, una constante. \texttt{epsilon} no es token. ACTION añade \texttt{\$} como columna 32.
+\section*{No terminales y símbolo inicial}
+\texttt{Program, Block, Items, Item, Decl, Type, Init, Stmt, Matched, Unmatched, Simple, Expr, Equality, Relation, Add, Mul, Unary, Primary}.
+El símbolo inicial es \texttt{Program}. La aumentación agrega \texttt{Start -> Program} (p0). Las listas vacías y los inicializadores ausentes tienen una parte derecha vacía.
+\section*{Unidad de entrada y declaraciones}
+La unidad completa reconocida por Program contiene una función \texttt{int main()} y su bloque. Por ejemplo:
+\begin{lstlisting}[language=C]
+int main() {
+    int x = 10;
+    return x;
+}
+\end{lstlisting}
+La declaración \texttt{int x = 10;} es válida dentro del bloque, pero no constituye un Program completo por sí sola. Las declaraciones y las asignaciones se distinguen por su estructura: la declaración comienza por Type y la asignación por ID.
+\clearpage\section*{Producciones completas}
+La numeración es la usada por las reducciones y las acciones SDT.
+{\footnotesize\renewcommand{\arraystretch}{1.0}\input{producciones.tex}}
+\clearpage\section*{Precedencia y asociatividad}
+De mayor a menor prioridad: primarios y paréntesis; prefijos \texttt{+ - !}; \texttt{* / \%}; \texttt{+ -}; \texttt{< <= > >=}; \texttt{== !=}. Los prefijos se asocian a la derecha y los binarios a la izquierda. La asignación solo es sentencia o inicialización, no parte de Expr.
+
+\texttt{Matched/Unmatched} asocia cada \texttt{else} con el \texttt{if} abierto más cercano. Las variantes de \texttt{while} conservan esa distinción. Las declaraciones como cuerpo de control requieren llaves.
+
+\section*{Cómo reconocer una declaración}
+Para \texttt{int x = 10;} dentro de main, el lexer entrega \texttt{int ID = INT ;}. Los lexemas \texttt{x} y \texttt{10} permanecen asociados a sus tokens. La gramática organiza esa secuencia con estas reglas:
+\begin{lstlisting}
+p7:  Decl -> Type ID Init ;
+p8:  Type -> int
+p11: Init -> = Expr
+p46: Primary -> INT
+\end{lstlisting}
+Entre Expr y Primary se aplican las producciones de paso 25, 28, 33, 36, 40 y 44. No se omiten al construir el árbol. Así, la declaración tiene cuatro hijos: Type, ID, Init y el punto y coma.
+
+En \texttt{int x;} se usa p12, \texttt{Init -> epsilon}. Init sigue siendo un nodo del árbol, pero no tiene hijos. La declaración no cambia de producción: sigue usando p7.
+\clearpage\section*{Función de los grupos de no terminales}
+\begin{tabularx}{\linewidth}{@{}p{4.3cm}X@{}}\toprule Grupo & Estructura que representa\\\midrule
+Program y Block & La unidad completa y un cuerpo delimitado por llaves.\\
+Items e Item & Una lista de declaraciones y sentencias; Items también permite una lista vacía.\\
+Decl, Type e Init & Nombre, tipo e inicialización opcional de una variable.\\
+Stmt, Matched y Unmatched & Sentencias y asociación no ambigua de if/else.\\
+Simple & Asignación, retorno o punto y coma aislado.\\
+Expr hasta Primary & Niveles de prioridad de las expresiones.\\\bottomrule\end{tabularx}
+\section*{Ejemplos de prioridad y agrupación}
+\texttt{2 + 3 * 4} se reconoce como \texttt{2 + (3 * 4)} porque Add utiliza un Mul completo como operando. \texttt{8 - 3 - 1} se agrupa como \texttt{(8 - 3) - 1} por la recursión izquierda de Add. Los paréntesis de \texttt{(2 + 3) * 4} fuerzan primero la suma.
+
+La forma \texttt{if (x) if (y) ; else ;} vincula el else con el if de y. Matched representa la sentencia interior con else; Unmatched permite que el if exterior siga abierto. No se resuelve este caso dando prioridad manual al token else en ACTION.
+
+\section*{Límites y verificación}
+Se admiten bloques, declaraciones de una variable, asignaciones, expresiones, \texttt{if/else}, \texttt{while} y \texttt{return Expr;}. Se excluyen otras funciones y llamadas, declaraciones globales, arreglos, apuntadores, \texttt{for}, \texttt{switch}, \texttt{struct}, preprocesador y operadores no enumerados. \texttt{STRING} permite reconocer sintácticamente \texttt{int x="hello";} y rechazarlo después en SDT; no añade un tipo declarable de cadena.
+
+La gramática produce 161 estados canónicos y 730 transiciones. Su tabla ACTION/GOTO no presenta conflictos shift/reduce ni reduce/reduce.
+\end{document}
