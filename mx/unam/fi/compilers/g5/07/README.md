@@ -5,10 +5,12 @@
 ```
 07/
 ├── resources/
-│   └── keywords.txt          # print, int, float, char, return, if, else, while
+│   ├── keywords.txt          # print, int, float, char, return, if, else, while
+│   └── parser/               # gramatica.json + action_goto.json (Model Designer, #2-#4)
 ├── src/main/
 │   ├── lexer.py              # Lexer del proyecto anterior (+ float/char/while y 'c')
 │   ├── token_stream.py       # Puente lexer -> parser: tokens a terminales + $
+│   ├── clr1_parser.py        # Motor CLR(1): shift/reduce/goto/accept, árbol y traza
 │   └── main.py               # CLI
 ├── examples/
 │   └── example_profesor.c
@@ -47,7 +49,45 @@ mensajes de error del parser y para el SDT.
 from token_stream import tokenize_source, LexicalError
 
 terminals = tokenize_source("int x = 10;")
-[t.symbol for t in terminals]   # ['int', 'id', '=', 'num', ';', '$']
+[t.symbol for t in terminals]   # ['int', 'ID', '=', 'INT', ';', '$']
+```
+
+## Motor CLR(1) (issue #5)
+
+`clr1_parser.py` no calcula la colección LR(1): lee la gramática y la tabla
+ACTION/GOTO del Model Designer desde `resources/parser/`:
+
+- `gramatica.json`: producciones `{id, lhs, rhs}` (rhs vacío = epsilon).
+- `action_goto.json`: `action` con `["s", n]`, `["r", p]` o `["acc", 0]` y
+  `goto` con `{state, nonterminal, target}`. Si una celda trae más de una
+  acción (conflicto), la tabla se rechaza.
+
+En cada paso consulta `ACTION[estado, terminal]`: *shift* apila el estado y
+avanza; *reduce* saca `|rhs|` estados y apila `GOTO[estado, lhs]`; *accept*
+termina con `Parsing Success!`; una celda vacía da `Parsing error in line n`.
+
+Cada reducción crea un nodo del árbol (`ParseNode`: símbolo, producción,
+hijos y, en las hojas, el `Terminal` con lexema y línea). La raíz es
+`Program` y queda lista para el SDT (#8).
+
+**Línea del error.** Un `;` faltante se detecta hasta leer el siguiente
+token, que suele estar en la línea de abajo. El parser prueba insertar un
+`;`: si con él el token siguiente sí puede continuar, reporta la línea del
+token anterior (donde faltó el `;`). Si no, reporta la línea del token
+inesperado.
+
+```python
+from token_stream import tokenize_source
+from clr1_parser import Parser, ParseError
+
+parser = Parser()
+try:
+    result = parser.parse(tokenize_source(codigo), trace=True)
+    print(result.message)        # Parsing Success!
+    result.tree                  # raíz del árbol
+    result.steps                 # traza paso a paso
+except ParseError as error:
+    print(error)                 # Parsing error in line n
 ```
 
 ## Uso
@@ -58,6 +98,9 @@ Desde `src/main/`:
 python main.py                                  # ejemplo del profesor
 python main.py --file programa.c                # tabla de tokens
 python main.py --text "int x = 10;" --terminals # lo que recibe el parser
+python main.py --file programa.c --parse        # Parsing Success! / error
+python main.py --file programa.c --trace        # pasos shift/reduce
+python main.py --file programa.c --tree         # árbol de parseo
 ```
 
 ## Pruebas
@@ -67,3 +110,6 @@ Desde `07/`:
 ```bash
 python -m pytest tests
 ```
+
+Las pruebas con la gramática completa se saltan (`skipped`) si
+`resources/parser/` todavía no tiene los archivos del Model Designer.
