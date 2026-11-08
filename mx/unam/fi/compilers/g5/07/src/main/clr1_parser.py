@@ -171,26 +171,33 @@ class ParseNode:
     @property
     def line(self):
         """Source line: the terminal's own line, or the first one below."""
-        if self.terminal is not None:
-            return self.terminal.line
-        for child in self.children:
-            line = child.line
-            if line is not None:
-                return line
+        stack = [self]
+        while stack:
+            node = stack.pop()
+            if node.terminal is not None:
+                return node.terminal.line
+            stack.extend(reversed(node.children))
         return None
 
     def pretty(self, indent=0):
-        """Indented text form of the subtree, one node per line."""
-        pad = "  " * indent
-        if self.is_terminal:
-            text = f"{pad}{self.symbol} {self.lexeme!r} (line {self.line})"
-        elif not self.children:
-            text = f"{pad}{self.symbol} -> epsilon"
-        else:
-            text = f"{pad}{self.symbol}"
-        lines = [text]
-        for child in self.children:
-            lines.append(child.pretty(indent + 1))
+        """
+        Indented text form of the subtree, one node per line. Uses an
+        explicit stack, so long programs (deep Items chains) do not hit
+        Python's recursion limit.
+        """
+        lines = []
+        stack = [(self, indent)]
+        while stack:
+            node, depth = stack.pop()
+            pad = "  " * depth
+            if node.is_terminal:
+                lines.append(f"{pad}{node.symbol} {node.lexeme!r} (line {node.line})")
+            elif not node.children:
+                lines.append(f"{pad}{node.symbol} -> epsilon")
+            else:
+                lines.append(f"{pad}{node.symbol}")
+            for child in reversed(node.children):
+                stack.append((child, depth + 1))
         return "\n".join(lines)
 
     def __repr__(self):

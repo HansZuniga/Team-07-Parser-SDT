@@ -11,6 +11,7 @@
 │   ├── lexer.py              # Lexer del proyecto anterior (+ float/char/while y 'c')
 │   ├── token_stream.py       # Puente lexer -> parser: tokens a terminales + $
 │   ├── clr1_parser.py        # Motor CLR(1): shift/reduce/goto/accept, árbol y traza
+│   ├── sdt.py                # SDT: tabla de símbolos, ámbitos y tipos
 │   └── main.py               # CLI
 ├── examples/
 │   └── example_profesor.c
@@ -90,6 +91,50 @@ except ParseError as error:
     print(error)                 # Parsing error in line n
 ```
 
+## SDT / análisis semántico (issue #8)
+
+`sdt.py` recorre el árbol que entrega el parser y aplica en cada nodo la
+acción semántica de su producción, según el documento del equipo
+"4. Reglas SDT y tabla de símbolos". Solo revisa nombres y tipos; no
+ejecuta el programa.
+
+- **Ámbitos:** cada `Block` abre uno (el de `main` es el 0). Se busca del
+  más interno al más externo; se permite sombrear en un bloque interior,
+  pero no declarar dos veces en el mismo. La tabla conserva todos los
+  registros aunque el bloque ya se haya cerrado.
+- **Tipos:** inicializar, asignar y `return` admiten la misma clase o una
+  más amplia (`char -> int -> float`). Las cadenas no se asignan a nada.
+
+| Destino \ origen | char | int | float |
+|------------------|------|-----|-------|
+| char             | sí   | no  | no    |
+| int              | sí   | sí  | no    |
+| float            | sí   | sí  | sí    |
+
+- `+ - * /` piden números (char sube a int; float si hay algún float);
+  `%` solo char/int; comparaciones y `!` dan int; las condiciones de
+  `if`/`while` deben ser numéricas; `return` debe ser compatible con int.
+
+Se reporta el primer error, con la línea del token responsable:
+
+| Código | Error | Ejemplo |
+|--------|-------|---------|
+| SEM001 | declaración duplicada en el mismo ámbito | `int x; int x;` |
+| SEM002 | identificador no declarado | `y = 1;` |
+| SEM003 | asignación incompatible | `char c; c = c + 1;` |
+| SEM004 | inicialización incompatible | `int x = "hello";` |
+| SEM005 | tipo inválido para un operador | `float f; int m = f % 2;` |
+| SEM006 | condición no numérica | `if ("a") ;` |
+| SEM007 | `return` no compatible con int | `return 2.5;` |
+
+SEM001-SEM004 vienen del documento del equipo; SEM005-SEM007 nombran las
+demás revisiones que pide ese documento.
+
+```
+Parsing Success!
+SDT Verified!            # o: SDT error in line n
+```
+
 ## Uso
 
 Desde `src/main/`:
@@ -101,6 +146,8 @@ python main.py --text "int x = 10;" --terminals # lo que recibe el parser
 python main.py --file programa.c --parse        # Parsing Success! / error
 python main.py --file programa.c --trace        # pasos shift/reduce
 python main.py --file programa.c --tree         # árbol de parseo
+python main.py --file programa.c --sdt          # parser + SDT
+python main.py --file programa.c --symbols      # parser + SDT + tabla de símbolos
 ```
 
 ## Pruebas
