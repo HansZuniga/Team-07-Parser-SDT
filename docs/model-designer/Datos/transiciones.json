@@ -1,0 +1,3652 @@
+[
+  {
+    "state": 0,
+    "symbol": "Program",
+    "target": 1
+  },
+  {
+    "state": 0,
+    "symbol": "int",
+    "target": 2
+  },
+  {
+    "state": 2,
+    "symbol": "main",
+    "target": 3
+  },
+  {
+    "state": 3,
+    "symbol": "(",
+    "target": 4
+  },
+  {
+    "state": 4,
+    "symbol": ")",
+    "target": 5
+  },
+  {
+    "state": 5,
+    "symbol": "Block",
+    "target": 6
+  },
+  {
+    "state": 5,
+    "symbol": "{",
+    "target": 7
+  },
+  {
+    "state": 7,
+    "symbol": "Items",
+    "target": 8
+  },
+  {
+    "state": 8,
+    "symbol": ";",
+    "target": 9
+  },
+  {
+    "state": 8,
+    "symbol": "Block",
+    "target": 10
+  },
+  {
+    "state": 8,
+    "symbol": "Decl",
+    "target": 11
+  },
+  {
+    "state": 8,
+    "symbol": "ID",
+    "target": 12
+  },
+  {
+    "state": 8,
+    "symbol": "Item",
+    "target": 13
+  },
+  {
+    "state": 8,
+    "symbol": "Matched",
+    "target": 14
+  },
+  {
+    "state": 8,
+    "symbol": "Simple",
+    "target": 15
+  },
+  {
+    "state": 8,
+    "symbol": "Stmt",
+    "target": 16
+  },
+  {
+    "state": 8,
+    "symbol": "Type",
+    "target": 17
+  },
+  {
+    "state": 8,
+    "symbol": "Unmatched",
+    "target": 18
+  },
+  {
+    "state": 8,
+    "symbol": "char",
+    "target": 19
+  },
+  {
+    "state": 8,
+    "symbol": "float",
+    "target": 20
+  },
+  {
+    "state": 8,
+    "symbol": "if",
+    "target": 21
+  },
+  {
+    "state": 8,
+    "symbol": "int",
+    "target": 22
+  },
+  {
+    "state": 8,
+    "symbol": "return",
+    "target": 23
+  },
+  {
+    "state": 8,
+    "symbol": "while",
+    "target": 24
+  },
+  {
+    "state": 8,
+    "symbol": "{",
+    "target": 25
+  },
+  {
+    "state": 8,
+    "symbol": "}",
+    "target": 26
+  },
+  {
+    "state": 12,
+    "symbol": "=",
+    "target": 27
+  },
+  {
+    "state": 17,
+    "symbol": "ID",
+    "target": 28
+  },
+  {
+    "state": 21,
+    "symbol": "(",
+    "target": 29
+  },
+  {
+    "state": 23,
+    "symbol": "!",
+    "target": 30
+  },
+  {
+    "state": 23,
+    "symbol": "(",
+    "target": 31
+  },
+  {
+    "state": 23,
+    "symbol": "+",
+    "target": 32
+  },
+  {
+    "state": 23,
+    "symbol": "-",
+    "target": 33
+  },
+  {
+    "state": 23,
+    "symbol": "Add",
+    "target": 34
+  },
+  {
+    "state": 23,
+    "symbol": "CHAR",
+    "target": 35
+  },
+  {
+    "state": 23,
+    "symbol": "Equality",
+    "target": 36
+  },
+  {
+    "state": 23,
+    "symbol": "Expr",
+    "target": 37
+  },
+  {
+    "state": 23,
+    "symbol": "FLOAT",
+    "target": 38
+  },
+  {
+    "state": 23,
+    "symbol": "ID",
+    "target": 39
+  },
+  {
+    "state": 23,
+    "symbol": "INT",
+    "target": 40
+  },
+  {
+    "state": 23,
+    "symbol": "Mul",
+    "target": 41
+  },
+  {
+    "state": 23,
+    "symbol": "Primary",
+    "target": 42
+  },
+  {
+    "state": 23,
+    "symbol": "Relation",
+    "target": 43
+  },
+  {
+    "state": 23,
+    "symbol": "STRING",
+    "target": 44
+  },
+  {
+    "state": 23,
+    "symbol": "Unary",
+    "target": 45
+  },
+  {
+    "state": 24,
+    "symbol": "(",
+    "target": 46
+  },
+  {
+    "state": 25,
+    "symbol": "Items",
+    "target": 47
+  },
+  {
+    "state": 27,
+    "symbol": "!",
+    "target": 30
+  },
+  {
+    "state": 27,
+    "symbol": "(",
+    "target": 31
+  },
+  {
+    "state": 27,
+    "symbol": "+",
+    "target": 32
+  },
+  {
+    "state": 27,
+    "symbol": "-",
+    "target": 33
+  },
+  {
+    "state": 27,
+    "symbol": "Add",
+    "target": 34
+  },
+  {
+    "state": 27,
+    "symbol": "CHAR",
+    "target": 35
+  },
+  {
+    "state": 27,
+    "symbol": "Equality",
+    "target": 36
+  },
+  {
+    "state": 27,
+    "symbol": "Expr",
+    "target": 48
+  },
+  {
+    "state": 27,
+    "symbol": "FLOAT",
+    "target": 38
+  },
+  {
+    "state": 27,
+    "symbol": "ID",
+    "target": 39
+  },
+  {
+    "state": 27,
+    "symbol": "INT",
+    "target": 40
+  },
+  {
+    "state": 27,
+    "symbol": "Mul",
+    "target": 41
+  },
+  {
+    "state": 27,
+    "symbol": "Primary",
+    "target": 42
+  },
+  {
+    "state": 27,
+    "symbol": "Relation",
+    "target": 43
+  },
+  {
+    "state": 27,
+    "symbol": "STRING",
+    "target": 44
+  },
+  {
+    "state": 27,
+    "symbol": "Unary",
+    "target": 45
+  },
+  {
+    "state": 28,
+    "symbol": "=",
+    "target": 49
+  },
+  {
+    "state": 28,
+    "symbol": "Init",
+    "target": 50
+  },
+  {
+    "state": 29,
+    "symbol": "!",
+    "target": 51
+  },
+  {
+    "state": 29,
+    "symbol": "(",
+    "target": 52
+  },
+  {
+    "state": 29,
+    "symbol": "+",
+    "target": 53
+  },
+  {
+    "state": 29,
+    "symbol": "-",
+    "target": 54
+  },
+  {
+    "state": 29,
+    "symbol": "Add",
+    "target": 55
+  },
+  {
+    "state": 29,
+    "symbol": "CHAR",
+    "target": 56
+  },
+  {
+    "state": 29,
+    "symbol": "Equality",
+    "target": 57
+  },
+  {
+    "state": 29,
+    "symbol": "Expr",
+    "target": 58
+  },
+  {
+    "state": 29,
+    "symbol": "FLOAT",
+    "target": 59
+  },
+  {
+    "state": 29,
+    "symbol": "ID",
+    "target": 60
+  },
+  {
+    "state": 29,
+    "symbol": "INT",
+    "target": 61
+  },
+  {
+    "state": 29,
+    "symbol": "Mul",
+    "target": 62
+  },
+  {
+    "state": 29,
+    "symbol": "Primary",
+    "target": 63
+  },
+  {
+    "state": 29,
+    "symbol": "Relation",
+    "target": 64
+  },
+  {
+    "state": 29,
+    "symbol": "STRING",
+    "target": 65
+  },
+  {
+    "state": 29,
+    "symbol": "Unary",
+    "target": 66
+  },
+  {
+    "state": 30,
+    "symbol": "!",
+    "target": 30
+  },
+  {
+    "state": 30,
+    "symbol": "(",
+    "target": 31
+  },
+  {
+    "state": 30,
+    "symbol": "+",
+    "target": 32
+  },
+  {
+    "state": 30,
+    "symbol": "-",
+    "target": 33
+  },
+  {
+    "state": 30,
+    "symbol": "CHAR",
+    "target": 35
+  },
+  {
+    "state": 30,
+    "symbol": "FLOAT",
+    "target": 38
+  },
+  {
+    "state": 30,
+    "symbol": "ID",
+    "target": 39
+  },
+  {
+    "state": 30,
+    "symbol": "INT",
+    "target": 40
+  },
+  {
+    "state": 30,
+    "symbol": "Primary",
+    "target": 42
+  },
+  {
+    "state": 30,
+    "symbol": "STRING",
+    "target": 44
+  },
+  {
+    "state": 30,
+    "symbol": "Unary",
+    "target": 67
+  },
+  {
+    "state": 31,
+    "symbol": "!",
+    "target": 51
+  },
+  {
+    "state": 31,
+    "symbol": "(",
+    "target": 52
+  },
+  {
+    "state": 31,
+    "symbol": "+",
+    "target": 53
+  },
+  {
+    "state": 31,
+    "symbol": "-",
+    "target": 54
+  },
+  {
+    "state": 31,
+    "symbol": "Add",
+    "target": 55
+  },
+  {
+    "state": 31,
+    "symbol": "CHAR",
+    "target": 56
+  },
+  {
+    "state": 31,
+    "symbol": "Equality",
+    "target": 57
+  },
+  {
+    "state": 31,
+    "symbol": "Expr",
+    "target": 68
+  },
+  {
+    "state": 31,
+    "symbol": "FLOAT",
+    "target": 59
+  },
+  {
+    "state": 31,
+    "symbol": "ID",
+    "target": 60
+  },
+  {
+    "state": 31,
+    "symbol": "INT",
+    "target": 61
+  },
+  {
+    "state": 31,
+    "symbol": "Mul",
+    "target": 62
+  },
+  {
+    "state": 31,
+    "symbol": "Primary",
+    "target": 63
+  },
+  {
+    "state": 31,
+    "symbol": "Relation",
+    "target": 64
+  },
+  {
+    "state": 31,
+    "symbol": "STRING",
+    "target": 65
+  },
+  {
+    "state": 31,
+    "symbol": "Unary",
+    "target": 66
+  },
+  {
+    "state": 32,
+    "symbol": "!",
+    "target": 30
+  },
+  {
+    "state": 32,
+    "symbol": "(",
+    "target": 31
+  },
+  {
+    "state": 32,
+    "symbol": "+",
+    "target": 32
+  },
+  {
+    "state": 32,
+    "symbol": "-",
+    "target": 33
+  },
+  {
+    "state": 32,
+    "symbol": "CHAR",
+    "target": 35
+  },
+  {
+    "state": 32,
+    "symbol": "FLOAT",
+    "target": 38
+  },
+  {
+    "state": 32,
+    "symbol": "ID",
+    "target": 39
+  },
+  {
+    "state": 32,
+    "symbol": "INT",
+    "target": 40
+  },
+  {
+    "state": 32,
+    "symbol": "Primary",
+    "target": 42
+  },
+  {
+    "state": 32,
+    "symbol": "STRING",
+    "target": 44
+  },
+  {
+    "state": 32,
+    "symbol": "Unary",
+    "target": 69
+  },
+  {
+    "state": 33,
+    "symbol": "!",
+    "target": 30
+  },
+  {
+    "state": 33,
+    "symbol": "(",
+    "target": 31
+  },
+  {
+    "state": 33,
+    "symbol": "+",
+    "target": 32
+  },
+  {
+    "state": 33,
+    "symbol": "-",
+    "target": 33
+  },
+  {
+    "state": 33,
+    "symbol": "CHAR",
+    "target": 35
+  },
+  {
+    "state": 33,
+    "symbol": "FLOAT",
+    "target": 38
+  },
+  {
+    "state": 33,
+    "symbol": "ID",
+    "target": 39
+  },
+  {
+    "state": 33,
+    "symbol": "INT",
+    "target": 40
+  },
+  {
+    "state": 33,
+    "symbol": "Primary",
+    "target": 42
+  },
+  {
+    "state": 33,
+    "symbol": "STRING",
+    "target": 44
+  },
+  {
+    "state": 33,
+    "symbol": "Unary",
+    "target": 70
+  },
+  {
+    "state": 34,
+    "symbol": "+",
+    "target": 71
+  },
+  {
+    "state": 34,
+    "symbol": "-",
+    "target": 72
+  },
+  {
+    "state": 36,
+    "symbol": "!=",
+    "target": 73
+  },
+  {
+    "state": 36,
+    "symbol": "==",
+    "target": 74
+  },
+  {
+    "state": 37,
+    "symbol": ";",
+    "target": 75
+  },
+  {
+    "state": 41,
+    "symbol": "%",
+    "target": 76
+  },
+  {
+    "state": 41,
+    "symbol": "*",
+    "target": 77
+  },
+  {
+    "state": 41,
+    "symbol": "/",
+    "target": 78
+  },
+  {
+    "state": 43,
+    "symbol": "<",
+    "target": 79
+  },
+  {
+    "state": 43,
+    "symbol": "<=",
+    "target": 80
+  },
+  {
+    "state": 43,
+    "symbol": ">",
+    "target": 81
+  },
+  {
+    "state": 43,
+    "symbol": ">=",
+    "target": 82
+  },
+  {
+    "state": 46,
+    "symbol": "!",
+    "target": 51
+  },
+  {
+    "state": 46,
+    "symbol": "(",
+    "target": 52
+  },
+  {
+    "state": 46,
+    "symbol": "+",
+    "target": 53
+  },
+  {
+    "state": 46,
+    "symbol": "-",
+    "target": 54
+  },
+  {
+    "state": 46,
+    "symbol": "Add",
+    "target": 55
+  },
+  {
+    "state": 46,
+    "symbol": "CHAR",
+    "target": 56
+  },
+  {
+    "state": 46,
+    "symbol": "Equality",
+    "target": 57
+  },
+  {
+    "state": 46,
+    "symbol": "Expr",
+    "target": 83
+  },
+  {
+    "state": 46,
+    "symbol": "FLOAT",
+    "target": 59
+  },
+  {
+    "state": 46,
+    "symbol": "ID",
+    "target": 60
+  },
+  {
+    "state": 46,
+    "symbol": "INT",
+    "target": 61
+  },
+  {
+    "state": 46,
+    "symbol": "Mul",
+    "target": 62
+  },
+  {
+    "state": 46,
+    "symbol": "Primary",
+    "target": 63
+  },
+  {
+    "state": 46,
+    "symbol": "Relation",
+    "target": 64
+  },
+  {
+    "state": 46,
+    "symbol": "STRING",
+    "target": 65
+  },
+  {
+    "state": 46,
+    "symbol": "Unary",
+    "target": 66
+  },
+  {
+    "state": 47,
+    "symbol": ";",
+    "target": 9
+  },
+  {
+    "state": 47,
+    "symbol": "Block",
+    "target": 10
+  },
+  {
+    "state": 47,
+    "symbol": "Decl",
+    "target": 11
+  },
+  {
+    "state": 47,
+    "symbol": "ID",
+    "target": 12
+  },
+  {
+    "state": 47,
+    "symbol": "Item",
+    "target": 13
+  },
+  {
+    "state": 47,
+    "symbol": "Matched",
+    "target": 14
+  },
+  {
+    "state": 47,
+    "symbol": "Simple",
+    "target": 15
+  },
+  {
+    "state": 47,
+    "symbol": "Stmt",
+    "target": 16
+  },
+  {
+    "state": 47,
+    "symbol": "Type",
+    "target": 17
+  },
+  {
+    "state": 47,
+    "symbol": "Unmatched",
+    "target": 18
+  },
+  {
+    "state": 47,
+    "symbol": "char",
+    "target": 19
+  },
+  {
+    "state": 47,
+    "symbol": "float",
+    "target": 20
+  },
+  {
+    "state": 47,
+    "symbol": "if",
+    "target": 21
+  },
+  {
+    "state": 47,
+    "symbol": "int",
+    "target": 22
+  },
+  {
+    "state": 47,
+    "symbol": "return",
+    "target": 23
+  },
+  {
+    "state": 47,
+    "symbol": "while",
+    "target": 24
+  },
+  {
+    "state": 47,
+    "symbol": "{",
+    "target": 25
+  },
+  {
+    "state": 47,
+    "symbol": "}",
+    "target": 84
+  },
+  {
+    "state": 48,
+    "symbol": ";",
+    "target": 85
+  },
+  {
+    "state": 49,
+    "symbol": "!",
+    "target": 30
+  },
+  {
+    "state": 49,
+    "symbol": "(",
+    "target": 31
+  },
+  {
+    "state": 49,
+    "symbol": "+",
+    "target": 32
+  },
+  {
+    "state": 49,
+    "symbol": "-",
+    "target": 33
+  },
+  {
+    "state": 49,
+    "symbol": "Add",
+    "target": 34
+  },
+  {
+    "state": 49,
+    "symbol": "CHAR",
+    "target": 35
+  },
+  {
+    "state": 49,
+    "symbol": "Equality",
+    "target": 36
+  },
+  {
+    "state": 49,
+    "symbol": "Expr",
+    "target": 86
+  },
+  {
+    "state": 49,
+    "symbol": "FLOAT",
+    "target": 38
+  },
+  {
+    "state": 49,
+    "symbol": "ID",
+    "target": 39
+  },
+  {
+    "state": 49,
+    "symbol": "INT",
+    "target": 40
+  },
+  {
+    "state": 49,
+    "symbol": "Mul",
+    "target": 41
+  },
+  {
+    "state": 49,
+    "symbol": "Primary",
+    "target": 42
+  },
+  {
+    "state": 49,
+    "symbol": "Relation",
+    "target": 43
+  },
+  {
+    "state": 49,
+    "symbol": "STRING",
+    "target": 44
+  },
+  {
+    "state": 49,
+    "symbol": "Unary",
+    "target": 45
+  },
+  {
+    "state": 50,
+    "symbol": ";",
+    "target": 87
+  },
+  {
+    "state": 51,
+    "symbol": "!",
+    "target": 51
+  },
+  {
+    "state": 51,
+    "symbol": "(",
+    "target": 52
+  },
+  {
+    "state": 51,
+    "symbol": "+",
+    "target": 53
+  },
+  {
+    "state": 51,
+    "symbol": "-",
+    "target": 54
+  },
+  {
+    "state": 51,
+    "symbol": "CHAR",
+    "target": 56
+  },
+  {
+    "state": 51,
+    "symbol": "FLOAT",
+    "target": 59
+  },
+  {
+    "state": 51,
+    "symbol": "ID",
+    "target": 60
+  },
+  {
+    "state": 51,
+    "symbol": "INT",
+    "target": 61
+  },
+  {
+    "state": 51,
+    "symbol": "Primary",
+    "target": 63
+  },
+  {
+    "state": 51,
+    "symbol": "STRING",
+    "target": 65
+  },
+  {
+    "state": 51,
+    "symbol": "Unary",
+    "target": 88
+  },
+  {
+    "state": 52,
+    "symbol": "!",
+    "target": 51
+  },
+  {
+    "state": 52,
+    "symbol": "(",
+    "target": 52
+  },
+  {
+    "state": 52,
+    "symbol": "+",
+    "target": 53
+  },
+  {
+    "state": 52,
+    "symbol": "-",
+    "target": 54
+  },
+  {
+    "state": 52,
+    "symbol": "Add",
+    "target": 55
+  },
+  {
+    "state": 52,
+    "symbol": "CHAR",
+    "target": 56
+  },
+  {
+    "state": 52,
+    "symbol": "Equality",
+    "target": 57
+  },
+  {
+    "state": 52,
+    "symbol": "Expr",
+    "target": 89
+  },
+  {
+    "state": 52,
+    "symbol": "FLOAT",
+    "target": 59
+  },
+  {
+    "state": 52,
+    "symbol": "ID",
+    "target": 60
+  },
+  {
+    "state": 52,
+    "symbol": "INT",
+    "target": 61
+  },
+  {
+    "state": 52,
+    "symbol": "Mul",
+    "target": 62
+  },
+  {
+    "state": 52,
+    "symbol": "Primary",
+    "target": 63
+  },
+  {
+    "state": 52,
+    "symbol": "Relation",
+    "target": 64
+  },
+  {
+    "state": 52,
+    "symbol": "STRING",
+    "target": 65
+  },
+  {
+    "state": 52,
+    "symbol": "Unary",
+    "target": 66
+  },
+  {
+    "state": 53,
+    "symbol": "!",
+    "target": 51
+  },
+  {
+    "state": 53,
+    "symbol": "(",
+    "target": 52
+  },
+  {
+    "state": 53,
+    "symbol": "+",
+    "target": 53
+  },
+  {
+    "state": 53,
+    "symbol": "-",
+    "target": 54
+  },
+  {
+    "state": 53,
+    "symbol": "CHAR",
+    "target": 56
+  },
+  {
+    "state": 53,
+    "symbol": "FLOAT",
+    "target": 59
+  },
+  {
+    "state": 53,
+    "symbol": "ID",
+    "target": 60
+  },
+  {
+    "state": 53,
+    "symbol": "INT",
+    "target": 61
+  },
+  {
+    "state": 53,
+    "symbol": "Primary",
+    "target": 63
+  },
+  {
+    "state": 53,
+    "symbol": "STRING",
+    "target": 65
+  },
+  {
+    "state": 53,
+    "symbol": "Unary",
+    "target": 90
+  },
+  {
+    "state": 54,
+    "symbol": "!",
+    "target": 51
+  },
+  {
+    "state": 54,
+    "symbol": "(",
+    "target": 52
+  },
+  {
+    "state": 54,
+    "symbol": "+",
+    "target": 53
+  },
+  {
+    "state": 54,
+    "symbol": "-",
+    "target": 54
+  },
+  {
+    "state": 54,
+    "symbol": "CHAR",
+    "target": 56
+  },
+  {
+    "state": 54,
+    "symbol": "FLOAT",
+    "target": 59
+  },
+  {
+    "state": 54,
+    "symbol": "ID",
+    "target": 60
+  },
+  {
+    "state": 54,
+    "symbol": "INT",
+    "target": 61
+  },
+  {
+    "state": 54,
+    "symbol": "Primary",
+    "target": 63
+  },
+  {
+    "state": 54,
+    "symbol": "STRING",
+    "target": 65
+  },
+  {
+    "state": 54,
+    "symbol": "Unary",
+    "target": 91
+  },
+  {
+    "state": 55,
+    "symbol": "+",
+    "target": 92
+  },
+  {
+    "state": 55,
+    "symbol": "-",
+    "target": 93
+  },
+  {
+    "state": 57,
+    "symbol": "!=",
+    "target": 94
+  },
+  {
+    "state": 57,
+    "symbol": "==",
+    "target": 95
+  },
+  {
+    "state": 58,
+    "symbol": ")",
+    "target": 96
+  },
+  {
+    "state": 62,
+    "symbol": "%",
+    "target": 97
+  },
+  {
+    "state": 62,
+    "symbol": "*",
+    "target": 98
+  },
+  {
+    "state": 62,
+    "symbol": "/",
+    "target": 99
+  },
+  {
+    "state": 64,
+    "symbol": "<",
+    "target": 100
+  },
+  {
+    "state": 64,
+    "symbol": "<=",
+    "target": 101
+  },
+  {
+    "state": 64,
+    "symbol": ">",
+    "target": 102
+  },
+  {
+    "state": 64,
+    "symbol": ">=",
+    "target": 103
+  },
+  {
+    "state": 68,
+    "symbol": ")",
+    "target": 104
+  },
+  {
+    "state": 71,
+    "symbol": "!",
+    "target": 30
+  },
+  {
+    "state": 71,
+    "symbol": "(",
+    "target": 31
+  },
+  {
+    "state": 71,
+    "symbol": "+",
+    "target": 32
+  },
+  {
+    "state": 71,
+    "symbol": "-",
+    "target": 33
+  },
+  {
+    "state": 71,
+    "symbol": "CHAR",
+    "target": 35
+  },
+  {
+    "state": 71,
+    "symbol": "FLOAT",
+    "target": 38
+  },
+  {
+    "state": 71,
+    "symbol": "ID",
+    "target": 39
+  },
+  {
+    "state": 71,
+    "symbol": "INT",
+    "target": 40
+  },
+  {
+    "state": 71,
+    "symbol": "Mul",
+    "target": 105
+  },
+  {
+    "state": 71,
+    "symbol": "Primary",
+    "target": 42
+  },
+  {
+    "state": 71,
+    "symbol": "STRING",
+    "target": 44
+  },
+  {
+    "state": 71,
+    "symbol": "Unary",
+    "target": 45
+  },
+  {
+    "state": 72,
+    "symbol": "!",
+    "target": 30
+  },
+  {
+    "state": 72,
+    "symbol": "(",
+    "target": 31
+  },
+  {
+    "state": 72,
+    "symbol": "+",
+    "target": 32
+  },
+  {
+    "state": 72,
+    "symbol": "-",
+    "target": 33
+  },
+  {
+    "state": 72,
+    "symbol": "CHAR",
+    "target": 35
+  },
+  {
+    "state": 72,
+    "symbol": "FLOAT",
+    "target": 38
+  },
+  {
+    "state": 72,
+    "symbol": "ID",
+    "target": 39
+  },
+  {
+    "state": 72,
+    "symbol": "INT",
+    "target": 40
+  },
+  {
+    "state": 72,
+    "symbol": "Mul",
+    "target": 106
+  },
+  {
+    "state": 72,
+    "symbol": "Primary",
+    "target": 42
+  },
+  {
+    "state": 72,
+    "symbol": "STRING",
+    "target": 44
+  },
+  {
+    "state": 72,
+    "symbol": "Unary",
+    "target": 45
+  },
+  {
+    "state": 73,
+    "symbol": "!",
+    "target": 30
+  },
+  {
+    "state": 73,
+    "symbol": "(",
+    "target": 31
+  },
+  {
+    "state": 73,
+    "symbol": "+",
+    "target": 32
+  },
+  {
+    "state": 73,
+    "symbol": "-",
+    "target": 33
+  },
+  {
+    "state": 73,
+    "symbol": "Add",
+    "target": 34
+  },
+  {
+    "state": 73,
+    "symbol": "CHAR",
+    "target": 35
+  },
+  {
+    "state": 73,
+    "symbol": "FLOAT",
+    "target": 38
+  },
+  {
+    "state": 73,
+    "symbol": "ID",
+    "target": 39
+  },
+  {
+    "state": 73,
+    "symbol": "INT",
+    "target": 40
+  },
+  {
+    "state": 73,
+    "symbol": "Mul",
+    "target": 41
+  },
+  {
+    "state": 73,
+    "symbol": "Primary",
+    "target": 42
+  },
+  {
+    "state": 73,
+    "symbol": "Relation",
+    "target": 107
+  },
+  {
+    "state": 73,
+    "symbol": "STRING",
+    "target": 44
+  },
+  {
+    "state": 73,
+    "symbol": "Unary",
+    "target": 45
+  },
+  {
+    "state": 74,
+    "symbol": "!",
+    "target": 30
+  },
+  {
+    "state": 74,
+    "symbol": "(",
+    "target": 31
+  },
+  {
+    "state": 74,
+    "symbol": "+",
+    "target": 32
+  },
+  {
+    "state": 74,
+    "symbol": "-",
+    "target": 33
+  },
+  {
+    "state": 74,
+    "symbol": "Add",
+    "target": 34
+  },
+  {
+    "state": 74,
+    "symbol": "CHAR",
+    "target": 35
+  },
+  {
+    "state": 74,
+    "symbol": "FLOAT",
+    "target": 38
+  },
+  {
+    "state": 74,
+    "symbol": "ID",
+    "target": 39
+  },
+  {
+    "state": 74,
+    "symbol": "INT",
+    "target": 40
+  },
+  {
+    "state": 74,
+    "symbol": "Mul",
+    "target": 41
+  },
+  {
+    "state": 74,
+    "symbol": "Primary",
+    "target": 42
+  },
+  {
+    "state": 74,
+    "symbol": "Relation",
+    "target": 108
+  },
+  {
+    "state": 74,
+    "symbol": "STRING",
+    "target": 44
+  },
+  {
+    "state": 74,
+    "symbol": "Unary",
+    "target": 45
+  },
+  {
+    "state": 76,
+    "symbol": "!",
+    "target": 30
+  },
+  {
+    "state": 76,
+    "symbol": "(",
+    "target": 31
+  },
+  {
+    "state": 76,
+    "symbol": "+",
+    "target": 32
+  },
+  {
+    "state": 76,
+    "symbol": "-",
+    "target": 33
+  },
+  {
+    "state": 76,
+    "symbol": "CHAR",
+    "target": 35
+  },
+  {
+    "state": 76,
+    "symbol": "FLOAT",
+    "target": 38
+  },
+  {
+    "state": 76,
+    "symbol": "ID",
+    "target": 39
+  },
+  {
+    "state": 76,
+    "symbol": "INT",
+    "target": 40
+  },
+  {
+    "state": 76,
+    "symbol": "Primary",
+    "target": 42
+  },
+  {
+    "state": 76,
+    "symbol": "STRING",
+    "target": 44
+  },
+  {
+    "state": 76,
+    "symbol": "Unary",
+    "target": 109
+  },
+  {
+    "state": 77,
+    "symbol": "!",
+    "target": 30
+  },
+  {
+    "state": 77,
+    "symbol": "(",
+    "target": 31
+  },
+  {
+    "state": 77,
+    "symbol": "+",
+    "target": 32
+  },
+  {
+    "state": 77,
+    "symbol": "-",
+    "target": 33
+  },
+  {
+    "state": 77,
+    "symbol": "CHAR",
+    "target": 35
+  },
+  {
+    "state": 77,
+    "symbol": "FLOAT",
+    "target": 38
+  },
+  {
+    "state": 77,
+    "symbol": "ID",
+    "target": 39
+  },
+  {
+    "state": 77,
+    "symbol": "INT",
+    "target": 40
+  },
+  {
+    "state": 77,
+    "symbol": "Primary",
+    "target": 42
+  },
+  {
+    "state": 77,
+    "symbol": "STRING",
+    "target": 44
+  },
+  {
+    "state": 77,
+    "symbol": "Unary",
+    "target": 110
+  },
+  {
+    "state": 78,
+    "symbol": "!",
+    "target": 30
+  },
+  {
+    "state": 78,
+    "symbol": "(",
+    "target": 31
+  },
+  {
+    "state": 78,
+    "symbol": "+",
+    "target": 32
+  },
+  {
+    "state": 78,
+    "symbol": "-",
+    "target": 33
+  },
+  {
+    "state": 78,
+    "symbol": "CHAR",
+    "target": 35
+  },
+  {
+    "state": 78,
+    "symbol": "FLOAT",
+    "target": 38
+  },
+  {
+    "state": 78,
+    "symbol": "ID",
+    "target": 39
+  },
+  {
+    "state": 78,
+    "symbol": "INT",
+    "target": 40
+  },
+  {
+    "state": 78,
+    "symbol": "Primary",
+    "target": 42
+  },
+  {
+    "state": 78,
+    "symbol": "STRING",
+    "target": 44
+  },
+  {
+    "state": 78,
+    "symbol": "Unary",
+    "target": 111
+  },
+  {
+    "state": 79,
+    "symbol": "!",
+    "target": 30
+  },
+  {
+    "state": 79,
+    "symbol": "(",
+    "target": 31
+  },
+  {
+    "state": 79,
+    "symbol": "+",
+    "target": 32
+  },
+  {
+    "state": 79,
+    "symbol": "-",
+    "target": 33
+  },
+  {
+    "state": 79,
+    "symbol": "Add",
+    "target": 112
+  },
+  {
+    "state": 79,
+    "symbol": "CHAR",
+    "target": 35
+  },
+  {
+    "state": 79,
+    "symbol": "FLOAT",
+    "target": 38
+  },
+  {
+    "state": 79,
+    "symbol": "ID",
+    "target": 39
+  },
+  {
+    "state": 79,
+    "symbol": "INT",
+    "target": 40
+  },
+  {
+    "state": 79,
+    "symbol": "Mul",
+    "target": 41
+  },
+  {
+    "state": 79,
+    "symbol": "Primary",
+    "target": 42
+  },
+  {
+    "state": 79,
+    "symbol": "STRING",
+    "target": 44
+  },
+  {
+    "state": 79,
+    "symbol": "Unary",
+    "target": 45
+  },
+  {
+    "state": 80,
+    "symbol": "!",
+    "target": 30
+  },
+  {
+    "state": 80,
+    "symbol": "(",
+    "target": 31
+  },
+  {
+    "state": 80,
+    "symbol": "+",
+    "target": 32
+  },
+  {
+    "state": 80,
+    "symbol": "-",
+    "target": 33
+  },
+  {
+    "state": 80,
+    "symbol": "Add",
+    "target": 113
+  },
+  {
+    "state": 80,
+    "symbol": "CHAR",
+    "target": 35
+  },
+  {
+    "state": 80,
+    "symbol": "FLOAT",
+    "target": 38
+  },
+  {
+    "state": 80,
+    "symbol": "ID",
+    "target": 39
+  },
+  {
+    "state": 80,
+    "symbol": "INT",
+    "target": 40
+  },
+  {
+    "state": 80,
+    "symbol": "Mul",
+    "target": 41
+  },
+  {
+    "state": 80,
+    "symbol": "Primary",
+    "target": 42
+  },
+  {
+    "state": 80,
+    "symbol": "STRING",
+    "target": 44
+  },
+  {
+    "state": 80,
+    "symbol": "Unary",
+    "target": 45
+  },
+  {
+    "state": 81,
+    "symbol": "!",
+    "target": 30
+  },
+  {
+    "state": 81,
+    "symbol": "(",
+    "target": 31
+  },
+  {
+    "state": 81,
+    "symbol": "+",
+    "target": 32
+  },
+  {
+    "state": 81,
+    "symbol": "-",
+    "target": 33
+  },
+  {
+    "state": 81,
+    "symbol": "Add",
+    "target": 114
+  },
+  {
+    "state": 81,
+    "symbol": "CHAR",
+    "target": 35
+  },
+  {
+    "state": 81,
+    "symbol": "FLOAT",
+    "target": 38
+  },
+  {
+    "state": 81,
+    "symbol": "ID",
+    "target": 39
+  },
+  {
+    "state": 81,
+    "symbol": "INT",
+    "target": 40
+  },
+  {
+    "state": 81,
+    "symbol": "Mul",
+    "target": 41
+  },
+  {
+    "state": 81,
+    "symbol": "Primary",
+    "target": 42
+  },
+  {
+    "state": 81,
+    "symbol": "STRING",
+    "target": 44
+  },
+  {
+    "state": 81,
+    "symbol": "Unary",
+    "target": 45
+  },
+  {
+    "state": 82,
+    "symbol": "!",
+    "target": 30
+  },
+  {
+    "state": 82,
+    "symbol": "(",
+    "target": 31
+  },
+  {
+    "state": 82,
+    "symbol": "+",
+    "target": 32
+  },
+  {
+    "state": 82,
+    "symbol": "-",
+    "target": 33
+  },
+  {
+    "state": 82,
+    "symbol": "Add",
+    "target": 115
+  },
+  {
+    "state": 82,
+    "symbol": "CHAR",
+    "target": 35
+  },
+  {
+    "state": 82,
+    "symbol": "FLOAT",
+    "target": 38
+  },
+  {
+    "state": 82,
+    "symbol": "ID",
+    "target": 39
+  },
+  {
+    "state": 82,
+    "symbol": "INT",
+    "target": 40
+  },
+  {
+    "state": 82,
+    "symbol": "Mul",
+    "target": 41
+  },
+  {
+    "state": 82,
+    "symbol": "Primary",
+    "target": 42
+  },
+  {
+    "state": 82,
+    "symbol": "STRING",
+    "target": 44
+  },
+  {
+    "state": 82,
+    "symbol": "Unary",
+    "target": 45
+  },
+  {
+    "state": 83,
+    "symbol": ")",
+    "target": 116
+  },
+  {
+    "state": 89,
+    "symbol": ")",
+    "target": 117
+  },
+  {
+    "state": 92,
+    "symbol": "!",
+    "target": 51
+  },
+  {
+    "state": 92,
+    "symbol": "(",
+    "target": 52
+  },
+  {
+    "state": 92,
+    "symbol": "+",
+    "target": 53
+  },
+  {
+    "state": 92,
+    "symbol": "-",
+    "target": 54
+  },
+  {
+    "state": 92,
+    "symbol": "CHAR",
+    "target": 56
+  },
+  {
+    "state": 92,
+    "symbol": "FLOAT",
+    "target": 59
+  },
+  {
+    "state": 92,
+    "symbol": "ID",
+    "target": 60
+  },
+  {
+    "state": 92,
+    "symbol": "INT",
+    "target": 61
+  },
+  {
+    "state": 92,
+    "symbol": "Mul",
+    "target": 118
+  },
+  {
+    "state": 92,
+    "symbol": "Primary",
+    "target": 63
+  },
+  {
+    "state": 92,
+    "symbol": "STRING",
+    "target": 65
+  },
+  {
+    "state": 92,
+    "symbol": "Unary",
+    "target": 66
+  },
+  {
+    "state": 93,
+    "symbol": "!",
+    "target": 51
+  },
+  {
+    "state": 93,
+    "symbol": "(",
+    "target": 52
+  },
+  {
+    "state": 93,
+    "symbol": "+",
+    "target": 53
+  },
+  {
+    "state": 93,
+    "symbol": "-",
+    "target": 54
+  },
+  {
+    "state": 93,
+    "symbol": "CHAR",
+    "target": 56
+  },
+  {
+    "state": 93,
+    "symbol": "FLOAT",
+    "target": 59
+  },
+  {
+    "state": 93,
+    "symbol": "ID",
+    "target": 60
+  },
+  {
+    "state": 93,
+    "symbol": "INT",
+    "target": 61
+  },
+  {
+    "state": 93,
+    "symbol": "Mul",
+    "target": 119
+  },
+  {
+    "state": 93,
+    "symbol": "Primary",
+    "target": 63
+  },
+  {
+    "state": 93,
+    "symbol": "STRING",
+    "target": 65
+  },
+  {
+    "state": 93,
+    "symbol": "Unary",
+    "target": 66
+  },
+  {
+    "state": 94,
+    "symbol": "!",
+    "target": 51
+  },
+  {
+    "state": 94,
+    "symbol": "(",
+    "target": 52
+  },
+  {
+    "state": 94,
+    "symbol": "+",
+    "target": 53
+  },
+  {
+    "state": 94,
+    "symbol": "-",
+    "target": 54
+  },
+  {
+    "state": 94,
+    "symbol": "Add",
+    "target": 55
+  },
+  {
+    "state": 94,
+    "symbol": "CHAR",
+    "target": 56
+  },
+  {
+    "state": 94,
+    "symbol": "FLOAT",
+    "target": 59
+  },
+  {
+    "state": 94,
+    "symbol": "ID",
+    "target": 60
+  },
+  {
+    "state": 94,
+    "symbol": "INT",
+    "target": 61
+  },
+  {
+    "state": 94,
+    "symbol": "Mul",
+    "target": 62
+  },
+  {
+    "state": 94,
+    "symbol": "Primary",
+    "target": 63
+  },
+  {
+    "state": 94,
+    "symbol": "Relation",
+    "target": 120
+  },
+  {
+    "state": 94,
+    "symbol": "STRING",
+    "target": 65
+  },
+  {
+    "state": 94,
+    "symbol": "Unary",
+    "target": 66
+  },
+  {
+    "state": 95,
+    "symbol": "!",
+    "target": 51
+  },
+  {
+    "state": 95,
+    "symbol": "(",
+    "target": 52
+  },
+  {
+    "state": 95,
+    "symbol": "+",
+    "target": 53
+  },
+  {
+    "state": 95,
+    "symbol": "-",
+    "target": 54
+  },
+  {
+    "state": 95,
+    "symbol": "Add",
+    "target": 55
+  },
+  {
+    "state": 95,
+    "symbol": "CHAR",
+    "target": 56
+  },
+  {
+    "state": 95,
+    "symbol": "FLOAT",
+    "target": 59
+  },
+  {
+    "state": 95,
+    "symbol": "ID",
+    "target": 60
+  },
+  {
+    "state": 95,
+    "symbol": "INT",
+    "target": 61
+  },
+  {
+    "state": 95,
+    "symbol": "Mul",
+    "target": 62
+  },
+  {
+    "state": 95,
+    "symbol": "Primary",
+    "target": 63
+  },
+  {
+    "state": 95,
+    "symbol": "Relation",
+    "target": 121
+  },
+  {
+    "state": 95,
+    "symbol": "STRING",
+    "target": 65
+  },
+  {
+    "state": 95,
+    "symbol": "Unary",
+    "target": 66
+  },
+  {
+    "state": 96,
+    "symbol": ";",
+    "target": 122
+  },
+  {
+    "state": 96,
+    "symbol": "Block",
+    "target": 123
+  },
+  {
+    "state": 96,
+    "symbol": "ID",
+    "target": 124
+  },
+  {
+    "state": 96,
+    "symbol": "Matched",
+    "target": 125
+  },
+  {
+    "state": 96,
+    "symbol": "Simple",
+    "target": 126
+  },
+  {
+    "state": 96,
+    "symbol": "Stmt",
+    "target": 127
+  },
+  {
+    "state": 96,
+    "symbol": "Unmatched",
+    "target": 18
+  },
+  {
+    "state": 96,
+    "symbol": "if",
+    "target": 128
+  },
+  {
+    "state": 96,
+    "symbol": "return",
+    "target": 129
+  },
+  {
+    "state": 96,
+    "symbol": "while",
+    "target": 130
+  },
+  {
+    "state": 96,
+    "symbol": "{",
+    "target": 131
+  },
+  {
+    "state": 97,
+    "symbol": "!",
+    "target": 51
+  },
+  {
+    "state": 97,
+    "symbol": "(",
+    "target": 52
+  },
+  {
+    "state": 97,
+    "symbol": "+",
+    "target": 53
+  },
+  {
+    "state": 97,
+    "symbol": "-",
+    "target": 54
+  },
+  {
+    "state": 97,
+    "symbol": "CHAR",
+    "target": 56
+  },
+  {
+    "state": 97,
+    "symbol": "FLOAT",
+    "target": 59
+  },
+  {
+    "state": 97,
+    "symbol": "ID",
+    "target": 60
+  },
+  {
+    "state": 97,
+    "symbol": "INT",
+    "target": 61
+  },
+  {
+    "state": 97,
+    "symbol": "Primary",
+    "target": 63
+  },
+  {
+    "state": 97,
+    "symbol": "STRING",
+    "target": 65
+  },
+  {
+    "state": 97,
+    "symbol": "Unary",
+    "target": 132
+  },
+  {
+    "state": 98,
+    "symbol": "!",
+    "target": 51
+  },
+  {
+    "state": 98,
+    "symbol": "(",
+    "target": 52
+  },
+  {
+    "state": 98,
+    "symbol": "+",
+    "target": 53
+  },
+  {
+    "state": 98,
+    "symbol": "-",
+    "target": 54
+  },
+  {
+    "state": 98,
+    "symbol": "CHAR",
+    "target": 56
+  },
+  {
+    "state": 98,
+    "symbol": "FLOAT",
+    "target": 59
+  },
+  {
+    "state": 98,
+    "symbol": "ID",
+    "target": 60
+  },
+  {
+    "state": 98,
+    "symbol": "INT",
+    "target": 61
+  },
+  {
+    "state": 98,
+    "symbol": "Primary",
+    "target": 63
+  },
+  {
+    "state": 98,
+    "symbol": "STRING",
+    "target": 65
+  },
+  {
+    "state": 98,
+    "symbol": "Unary",
+    "target": 133
+  },
+  {
+    "state": 99,
+    "symbol": "!",
+    "target": 51
+  },
+  {
+    "state": 99,
+    "symbol": "(",
+    "target": 52
+  },
+  {
+    "state": 99,
+    "symbol": "+",
+    "target": 53
+  },
+  {
+    "state": 99,
+    "symbol": "-",
+    "target": 54
+  },
+  {
+    "state": 99,
+    "symbol": "CHAR",
+    "target": 56
+  },
+  {
+    "state": 99,
+    "symbol": "FLOAT",
+    "target": 59
+  },
+  {
+    "state": 99,
+    "symbol": "ID",
+    "target": 60
+  },
+  {
+    "state": 99,
+    "symbol": "INT",
+    "target": 61
+  },
+  {
+    "state": 99,
+    "symbol": "Primary",
+    "target": 63
+  },
+  {
+    "state": 99,
+    "symbol": "STRING",
+    "target": 65
+  },
+  {
+    "state": 99,
+    "symbol": "Unary",
+    "target": 134
+  },
+  {
+    "state": 100,
+    "symbol": "!",
+    "target": 51
+  },
+  {
+    "state": 100,
+    "symbol": "(",
+    "target": 52
+  },
+  {
+    "state": 100,
+    "symbol": "+",
+    "target": 53
+  },
+  {
+    "state": 100,
+    "symbol": "-",
+    "target": 54
+  },
+  {
+    "state": 100,
+    "symbol": "Add",
+    "target": 135
+  },
+  {
+    "state": 100,
+    "symbol": "CHAR",
+    "target": 56
+  },
+  {
+    "state": 100,
+    "symbol": "FLOAT",
+    "target": 59
+  },
+  {
+    "state": 100,
+    "symbol": "ID",
+    "target": 60
+  },
+  {
+    "state": 100,
+    "symbol": "INT",
+    "target": 61
+  },
+  {
+    "state": 100,
+    "symbol": "Mul",
+    "target": 62
+  },
+  {
+    "state": 100,
+    "symbol": "Primary",
+    "target": 63
+  },
+  {
+    "state": 100,
+    "symbol": "STRING",
+    "target": 65
+  },
+  {
+    "state": 100,
+    "symbol": "Unary",
+    "target": 66
+  },
+  {
+    "state": 101,
+    "symbol": "!",
+    "target": 51
+  },
+  {
+    "state": 101,
+    "symbol": "(",
+    "target": 52
+  },
+  {
+    "state": 101,
+    "symbol": "+",
+    "target": 53
+  },
+  {
+    "state": 101,
+    "symbol": "-",
+    "target": 54
+  },
+  {
+    "state": 101,
+    "symbol": "Add",
+    "target": 136
+  },
+  {
+    "state": 101,
+    "symbol": "CHAR",
+    "target": 56
+  },
+  {
+    "state": 101,
+    "symbol": "FLOAT",
+    "target": 59
+  },
+  {
+    "state": 101,
+    "symbol": "ID",
+    "target": 60
+  },
+  {
+    "state": 101,
+    "symbol": "INT",
+    "target": 61
+  },
+  {
+    "state": 101,
+    "symbol": "Mul",
+    "target": 62
+  },
+  {
+    "state": 101,
+    "symbol": "Primary",
+    "target": 63
+  },
+  {
+    "state": 101,
+    "symbol": "STRING",
+    "target": 65
+  },
+  {
+    "state": 101,
+    "symbol": "Unary",
+    "target": 66
+  },
+  {
+    "state": 102,
+    "symbol": "!",
+    "target": 51
+  },
+  {
+    "state": 102,
+    "symbol": "(",
+    "target": 52
+  },
+  {
+    "state": 102,
+    "symbol": "+",
+    "target": 53
+  },
+  {
+    "state": 102,
+    "symbol": "-",
+    "target": 54
+  },
+  {
+    "state": 102,
+    "symbol": "Add",
+    "target": 137
+  },
+  {
+    "state": 102,
+    "symbol": "CHAR",
+    "target": 56
+  },
+  {
+    "state": 102,
+    "symbol": "FLOAT",
+    "target": 59
+  },
+  {
+    "state": 102,
+    "symbol": "ID",
+    "target": 60
+  },
+  {
+    "state": 102,
+    "symbol": "INT",
+    "target": 61
+  },
+  {
+    "state": 102,
+    "symbol": "Mul",
+    "target": 62
+  },
+  {
+    "state": 102,
+    "symbol": "Primary",
+    "target": 63
+  },
+  {
+    "state": 102,
+    "symbol": "STRING",
+    "target": 65
+  },
+  {
+    "state": 102,
+    "symbol": "Unary",
+    "target": 66
+  },
+  {
+    "state": 103,
+    "symbol": "!",
+    "target": 51
+  },
+  {
+    "state": 103,
+    "symbol": "(",
+    "target": 52
+  },
+  {
+    "state": 103,
+    "symbol": "+",
+    "target": 53
+  },
+  {
+    "state": 103,
+    "symbol": "-",
+    "target": 54
+  },
+  {
+    "state": 103,
+    "symbol": "Add",
+    "target": 138
+  },
+  {
+    "state": 103,
+    "symbol": "CHAR",
+    "target": 56
+  },
+  {
+    "state": 103,
+    "symbol": "FLOAT",
+    "target": 59
+  },
+  {
+    "state": 103,
+    "symbol": "ID",
+    "target": 60
+  },
+  {
+    "state": 103,
+    "symbol": "INT",
+    "target": 61
+  },
+  {
+    "state": 103,
+    "symbol": "Mul",
+    "target": 62
+  },
+  {
+    "state": 103,
+    "symbol": "Primary",
+    "target": 63
+  },
+  {
+    "state": 103,
+    "symbol": "STRING",
+    "target": 65
+  },
+  {
+    "state": 103,
+    "symbol": "Unary",
+    "target": 66
+  },
+  {
+    "state": 105,
+    "symbol": "%",
+    "target": 76
+  },
+  {
+    "state": 105,
+    "symbol": "*",
+    "target": 77
+  },
+  {
+    "state": 105,
+    "symbol": "/",
+    "target": 78
+  },
+  {
+    "state": 106,
+    "symbol": "%",
+    "target": 76
+  },
+  {
+    "state": 106,
+    "symbol": "*",
+    "target": 77
+  },
+  {
+    "state": 106,
+    "symbol": "/",
+    "target": 78
+  },
+  {
+    "state": 107,
+    "symbol": "<",
+    "target": 79
+  },
+  {
+    "state": 107,
+    "symbol": "<=",
+    "target": 80
+  },
+  {
+    "state": 107,
+    "symbol": ">",
+    "target": 81
+  },
+  {
+    "state": 107,
+    "symbol": ">=",
+    "target": 82
+  },
+  {
+    "state": 108,
+    "symbol": "<",
+    "target": 79
+  },
+  {
+    "state": 108,
+    "symbol": "<=",
+    "target": 80
+  },
+  {
+    "state": 108,
+    "symbol": ">",
+    "target": 81
+  },
+  {
+    "state": 108,
+    "symbol": ">=",
+    "target": 82
+  },
+  {
+    "state": 112,
+    "symbol": "+",
+    "target": 71
+  },
+  {
+    "state": 112,
+    "symbol": "-",
+    "target": 72
+  },
+  {
+    "state": 113,
+    "symbol": "+",
+    "target": 71
+  },
+  {
+    "state": 113,
+    "symbol": "-",
+    "target": 72
+  },
+  {
+    "state": 114,
+    "symbol": "+",
+    "target": 71
+  },
+  {
+    "state": 114,
+    "symbol": "-",
+    "target": 72
+  },
+  {
+    "state": 115,
+    "symbol": "+",
+    "target": 71
+  },
+  {
+    "state": 115,
+    "symbol": "-",
+    "target": 72
+  },
+  {
+    "state": 116,
+    "symbol": ";",
+    "target": 9
+  },
+  {
+    "state": 116,
+    "symbol": "Block",
+    "target": 10
+  },
+  {
+    "state": 116,
+    "symbol": "ID",
+    "target": 12
+  },
+  {
+    "state": 116,
+    "symbol": "Matched",
+    "target": 139
+  },
+  {
+    "state": 116,
+    "symbol": "Simple",
+    "target": 15
+  },
+  {
+    "state": 116,
+    "symbol": "Unmatched",
+    "target": 140
+  },
+  {
+    "state": 116,
+    "symbol": "if",
+    "target": 21
+  },
+  {
+    "state": 116,
+    "symbol": "return",
+    "target": 23
+  },
+  {
+    "state": 116,
+    "symbol": "while",
+    "target": 24
+  },
+  {
+    "state": 116,
+    "symbol": "{",
+    "target": 25
+  },
+  {
+    "state": 118,
+    "symbol": "%",
+    "target": 97
+  },
+  {
+    "state": 118,
+    "symbol": "*",
+    "target": 98
+  },
+  {
+    "state": 118,
+    "symbol": "/",
+    "target": 99
+  },
+  {
+    "state": 119,
+    "symbol": "%",
+    "target": 97
+  },
+  {
+    "state": 119,
+    "symbol": "*",
+    "target": 98
+  },
+  {
+    "state": 119,
+    "symbol": "/",
+    "target": 99
+  },
+  {
+    "state": 120,
+    "symbol": "<",
+    "target": 100
+  },
+  {
+    "state": 120,
+    "symbol": "<=",
+    "target": 101
+  },
+  {
+    "state": 120,
+    "symbol": ">",
+    "target": 102
+  },
+  {
+    "state": 120,
+    "symbol": ">=",
+    "target": 103
+  },
+  {
+    "state": 121,
+    "symbol": "<",
+    "target": 100
+  },
+  {
+    "state": 121,
+    "symbol": "<=",
+    "target": 101
+  },
+  {
+    "state": 121,
+    "symbol": ">",
+    "target": 102
+  },
+  {
+    "state": 121,
+    "symbol": ">=",
+    "target": 103
+  },
+  {
+    "state": 124,
+    "symbol": "=",
+    "target": 141
+  },
+  {
+    "state": 125,
+    "symbol": "else",
+    "target": 142
+  },
+  {
+    "state": 128,
+    "symbol": "(",
+    "target": 143
+  },
+  {
+    "state": 129,
+    "symbol": "!",
+    "target": 30
+  },
+  {
+    "state": 129,
+    "symbol": "(",
+    "target": 31
+  },
+  {
+    "state": 129,
+    "symbol": "+",
+    "target": 32
+  },
+  {
+    "state": 129,
+    "symbol": "-",
+    "target": 33
+  },
+  {
+    "state": 129,
+    "symbol": "Add",
+    "target": 34
+  },
+  {
+    "state": 129,
+    "symbol": "CHAR",
+    "target": 35
+  },
+  {
+    "state": 129,
+    "symbol": "Equality",
+    "target": 36
+  },
+  {
+    "state": 129,
+    "symbol": "Expr",
+    "target": 144
+  },
+  {
+    "state": 129,
+    "symbol": "FLOAT",
+    "target": 38
+  },
+  {
+    "state": 129,
+    "symbol": "ID",
+    "target": 39
+  },
+  {
+    "state": 129,
+    "symbol": "INT",
+    "target": 40
+  },
+  {
+    "state": 129,
+    "symbol": "Mul",
+    "target": 41
+  },
+  {
+    "state": 129,
+    "symbol": "Primary",
+    "target": 42
+  },
+  {
+    "state": 129,
+    "symbol": "Relation",
+    "target": 43
+  },
+  {
+    "state": 129,
+    "symbol": "STRING",
+    "target": 44
+  },
+  {
+    "state": 129,
+    "symbol": "Unary",
+    "target": 45
+  },
+  {
+    "state": 130,
+    "symbol": "(",
+    "target": 145
+  },
+  {
+    "state": 131,
+    "symbol": "Items",
+    "target": 146
+  },
+  {
+    "state": 135,
+    "symbol": "+",
+    "target": 92
+  },
+  {
+    "state": 135,
+    "symbol": "-",
+    "target": 93
+  },
+  {
+    "state": 136,
+    "symbol": "+",
+    "target": 92
+  },
+  {
+    "state": 136,
+    "symbol": "-",
+    "target": 93
+  },
+  {
+    "state": 137,
+    "symbol": "+",
+    "target": 92
+  },
+  {
+    "state": 137,
+    "symbol": "-",
+    "target": 93
+  },
+  {
+    "state": 138,
+    "symbol": "+",
+    "target": 92
+  },
+  {
+    "state": 138,
+    "symbol": "-",
+    "target": 93
+  },
+  {
+    "state": 141,
+    "symbol": "!",
+    "target": 30
+  },
+  {
+    "state": 141,
+    "symbol": "(",
+    "target": 31
+  },
+  {
+    "state": 141,
+    "symbol": "+",
+    "target": 32
+  },
+  {
+    "state": 141,
+    "symbol": "-",
+    "target": 33
+  },
+  {
+    "state": 141,
+    "symbol": "Add",
+    "target": 34
+  },
+  {
+    "state": 141,
+    "symbol": "CHAR",
+    "target": 35
+  },
+  {
+    "state": 141,
+    "symbol": "Equality",
+    "target": 36
+  },
+  {
+    "state": 141,
+    "symbol": "Expr",
+    "target": 147
+  },
+  {
+    "state": 141,
+    "symbol": "FLOAT",
+    "target": 38
+  },
+  {
+    "state": 141,
+    "symbol": "ID",
+    "target": 39
+  },
+  {
+    "state": 141,
+    "symbol": "INT",
+    "target": 40
+  },
+  {
+    "state": 141,
+    "symbol": "Mul",
+    "target": 41
+  },
+  {
+    "state": 141,
+    "symbol": "Primary",
+    "target": 42
+  },
+  {
+    "state": 141,
+    "symbol": "Relation",
+    "target": 43
+  },
+  {
+    "state": 141,
+    "symbol": "STRING",
+    "target": 44
+  },
+  {
+    "state": 141,
+    "symbol": "Unary",
+    "target": 45
+  },
+  {
+    "state": 142,
+    "symbol": ";",
+    "target": 9
+  },
+  {
+    "state": 142,
+    "symbol": "Block",
+    "target": 10
+  },
+  {
+    "state": 142,
+    "symbol": "ID",
+    "target": 12
+  },
+  {
+    "state": 142,
+    "symbol": "Matched",
+    "target": 148
+  },
+  {
+    "state": 142,
+    "symbol": "Simple",
+    "target": 15
+  },
+  {
+    "state": 142,
+    "symbol": "Unmatched",
+    "target": 149
+  },
+  {
+    "state": 142,
+    "symbol": "if",
+    "target": 21
+  },
+  {
+    "state": 142,
+    "symbol": "return",
+    "target": 23
+  },
+  {
+    "state": 142,
+    "symbol": "while",
+    "target": 24
+  },
+  {
+    "state": 142,
+    "symbol": "{",
+    "target": 25
+  },
+  {
+    "state": 143,
+    "symbol": "!",
+    "target": 51
+  },
+  {
+    "state": 143,
+    "symbol": "(",
+    "target": 52
+  },
+  {
+    "state": 143,
+    "symbol": "+",
+    "target": 53
+  },
+  {
+    "state": 143,
+    "symbol": "-",
+    "target": 54
+  },
+  {
+    "state": 143,
+    "symbol": "Add",
+    "target": 55
+  },
+  {
+    "state": 143,
+    "symbol": "CHAR",
+    "target": 56
+  },
+  {
+    "state": 143,
+    "symbol": "Equality",
+    "target": 57
+  },
+  {
+    "state": 143,
+    "symbol": "Expr",
+    "target": 150
+  },
+  {
+    "state": 143,
+    "symbol": "FLOAT",
+    "target": 59
+  },
+  {
+    "state": 143,
+    "symbol": "ID",
+    "target": 60
+  },
+  {
+    "state": 143,
+    "symbol": "INT",
+    "target": 61
+  },
+  {
+    "state": 143,
+    "symbol": "Mul",
+    "target": 62
+  },
+  {
+    "state": 143,
+    "symbol": "Primary",
+    "target": 63
+  },
+  {
+    "state": 143,
+    "symbol": "Relation",
+    "target": 64
+  },
+  {
+    "state": 143,
+    "symbol": "STRING",
+    "target": 65
+  },
+  {
+    "state": 143,
+    "symbol": "Unary",
+    "target": 66
+  },
+  {
+    "state": 144,
+    "symbol": ";",
+    "target": 151
+  },
+  {
+    "state": 145,
+    "symbol": "!",
+    "target": 51
+  },
+  {
+    "state": 145,
+    "symbol": "(",
+    "target": 52
+  },
+  {
+    "state": 145,
+    "symbol": "+",
+    "target": 53
+  },
+  {
+    "state": 145,
+    "symbol": "-",
+    "target": 54
+  },
+  {
+    "state": 145,
+    "symbol": "Add",
+    "target": 55
+  },
+  {
+    "state": 145,
+    "symbol": "CHAR",
+    "target": 56
+  },
+  {
+    "state": 145,
+    "symbol": "Equality",
+    "target": 57
+  },
+  {
+    "state": 145,
+    "symbol": "Expr",
+    "target": 152
+  },
+  {
+    "state": 145,
+    "symbol": "FLOAT",
+    "target": 59
+  },
+  {
+    "state": 145,
+    "symbol": "ID",
+    "target": 60
+  },
+  {
+    "state": 145,
+    "symbol": "INT",
+    "target": 61
+  },
+  {
+    "state": 145,
+    "symbol": "Mul",
+    "target": 62
+  },
+  {
+    "state": 145,
+    "symbol": "Primary",
+    "target": 63
+  },
+  {
+    "state": 145,
+    "symbol": "Relation",
+    "target": 64
+  },
+  {
+    "state": 145,
+    "symbol": "STRING",
+    "target": 65
+  },
+  {
+    "state": 145,
+    "symbol": "Unary",
+    "target": 66
+  },
+  {
+    "state": 146,
+    "symbol": ";",
+    "target": 9
+  },
+  {
+    "state": 146,
+    "symbol": "Block",
+    "target": 10
+  },
+  {
+    "state": 146,
+    "symbol": "Decl",
+    "target": 11
+  },
+  {
+    "state": 146,
+    "symbol": "ID",
+    "target": 12
+  },
+  {
+    "state": 146,
+    "symbol": "Item",
+    "target": 13
+  },
+  {
+    "state": 146,
+    "symbol": "Matched",
+    "target": 14
+  },
+  {
+    "state": 146,
+    "symbol": "Simple",
+    "target": 15
+  },
+  {
+    "state": 146,
+    "symbol": "Stmt",
+    "target": 16
+  },
+  {
+    "state": 146,
+    "symbol": "Type",
+    "target": 17
+  },
+  {
+    "state": 146,
+    "symbol": "Unmatched",
+    "target": 18
+  },
+  {
+    "state": 146,
+    "symbol": "char",
+    "target": 19
+  },
+  {
+    "state": 146,
+    "symbol": "float",
+    "target": 20
+  },
+  {
+    "state": 146,
+    "symbol": "if",
+    "target": 21
+  },
+  {
+    "state": 146,
+    "symbol": "int",
+    "target": 22
+  },
+  {
+    "state": 146,
+    "symbol": "return",
+    "target": 23
+  },
+  {
+    "state": 146,
+    "symbol": "while",
+    "target": 24
+  },
+  {
+    "state": 146,
+    "symbol": "{",
+    "target": 25
+  },
+  {
+    "state": 146,
+    "symbol": "}",
+    "target": 153
+  },
+  {
+    "state": 147,
+    "symbol": ";",
+    "target": 154
+  },
+  {
+    "state": 150,
+    "symbol": ")",
+    "target": 155
+  },
+  {
+    "state": 152,
+    "symbol": ")",
+    "target": 156
+  },
+  {
+    "state": 155,
+    "symbol": ";",
+    "target": 122
+  },
+  {
+    "state": 155,
+    "symbol": "Block",
+    "target": 123
+  },
+  {
+    "state": 155,
+    "symbol": "ID",
+    "target": 124
+  },
+  {
+    "state": 155,
+    "symbol": "Matched",
+    "target": 157
+  },
+  {
+    "state": 155,
+    "symbol": "Simple",
+    "target": 126
+  },
+  {
+    "state": 155,
+    "symbol": "Stmt",
+    "target": 127
+  },
+  {
+    "state": 155,
+    "symbol": "Unmatched",
+    "target": 18
+  },
+  {
+    "state": 155,
+    "symbol": "if",
+    "target": 128
+  },
+  {
+    "state": 155,
+    "symbol": "return",
+    "target": 129
+  },
+  {
+    "state": 155,
+    "symbol": "while",
+    "target": 130
+  },
+  {
+    "state": 155,
+    "symbol": "{",
+    "target": 131
+  },
+  {
+    "state": 156,
+    "symbol": ";",
+    "target": 122
+  },
+  {
+    "state": 156,
+    "symbol": "Block",
+    "target": 123
+  },
+  {
+    "state": 156,
+    "symbol": "ID",
+    "target": 124
+  },
+  {
+    "state": 156,
+    "symbol": "Matched",
+    "target": 158
+  },
+  {
+    "state": 156,
+    "symbol": "Simple",
+    "target": 126
+  },
+  {
+    "state": 156,
+    "symbol": "Unmatched",
+    "target": 140
+  },
+  {
+    "state": 156,
+    "symbol": "if",
+    "target": 128
+  },
+  {
+    "state": 156,
+    "symbol": "return",
+    "target": 129
+  },
+  {
+    "state": 156,
+    "symbol": "while",
+    "target": 130
+  },
+  {
+    "state": 156,
+    "symbol": "{",
+    "target": 131
+  },
+  {
+    "state": 157,
+    "symbol": "else",
+    "target": 159
+  },
+  {
+    "state": 159,
+    "symbol": ";",
+    "target": 122
+  },
+  {
+    "state": 159,
+    "symbol": "Block",
+    "target": 123
+  },
+  {
+    "state": 159,
+    "symbol": "ID",
+    "target": 124
+  },
+  {
+    "state": 159,
+    "symbol": "Matched",
+    "target": 160
+  },
+  {
+    "state": 159,
+    "symbol": "Simple",
+    "target": 126
+  },
+  {
+    "state": 159,
+    "symbol": "Unmatched",
+    "target": 149
+  },
+  {
+    "state": 159,
+    "symbol": "if",
+    "target": 128
+  },
+  {
+    "state": 159,
+    "symbol": "return",
+    "target": 129
+  },
+  {
+    "state": 159,
+    "symbol": "while",
+    "target": 130
+  },
+  {
+    "state": 159,
+    "symbol": "{",
+    "target": 131
+  }
+]

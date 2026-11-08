@@ -1,0 +1,53 @@
+\begin{longtable}{@{}r p{10.2cm} p{4.6cm}@{}}\toprule ID & Producción & Función\\\midrule\endhead
+0 & \texttt{Start -\textgreater{} Program} & Regla aumentada; aceptación.\\
+1 & \texttt{Program -\textgreater{} int main ( ) Block} & Unidad de entrada.\\
+2 & \texttt{Block -\textgreater{} \{ Items \}} & Bloque y ámbito.\\
+3 & \texttt{Items -\textgreater{} Items Item} & Agrega un elemento.\\
+4 & \texttt{Items -\textgreater{} epsilon} & Lista vacía.\\
+5 & \texttt{Item -\textgreater{} Decl} & Elemento de declaración.\\
+6 & \texttt{Item -\textgreater{} Stmt} & Elemento de sentencia.\\
+7 & \texttt{Decl -\textgreater{} Type ID Init ;} & Variable e inicializador opcional.\\
+8 & \texttt{Type -\textgreater{} int} & Tipo entero.\\
+9 & \texttt{Type -\textgreater{} float} & Tipo real.\\
+10 & \texttt{Type -\textgreater{} char} & Tipo carácter.\\
+11 & \texttt{Init -\textgreater{} = Expr} & Inicializador presente.\\
+12 & \texttt{Init -\textgreater{} epsilon} & Sin inicializador.\\
+13 & \texttt{Stmt -\textgreater{} Matched} & Sentencia cerrada.\\
+14 & \texttt{Stmt -\textgreater{} Unmatched} & Sentencia abierta.\\
+15 & \texttt{Matched -\textgreater{} Simple} & Instrucción simple.\\
+16 & \texttt{Matched -\textgreater{} Block} & Bloque delimitado.\\
+17 & \texttt{Matched -\textgreater{} if ( Expr ) Matched else Matched} & if/else cerrado.\\
+18 & \texttt{Matched -\textgreater{} while ( Expr ) Matched} & while de cuerpo cerrado.\\
+19 & \texttt{Unmatched -\textgreater{} if ( Expr ) Stmt} & if pendiente de else.\\
+20 & \texttt{Unmatched -\textgreater{} if ( Expr ) Matched else Unmatched} & if/else de cierre pendiente.\\
+21 & \texttt{Unmatched -\textgreater{} while ( Expr ) Unmatched} & while de cuerpo abierto.\\
+22 & \texttt{Simple -\textgreater{} ID = Expr ;} & Asignación.\\
+23 & \texttt{Simple -\textgreater{} return Expr ;} & Retorno con expresión.\\
+24 & \texttt{Simple -\textgreater{} ;} & Sentencia vacía.\\
+25 & \texttt{Expr -\textgreater{} Equality} & Entrada a expresión.\\
+26 & \texttt{Equality -\textgreater{} Equality == Relation} & Igualdad.\\
+27 & \texttt{Equality -\textgreater{} Equality != Relation} & Desigualdad.\\
+28 & \texttt{Equality -\textgreater{} Relation} & Paso a relaciones.\\
+29 & \texttt{Relation -\textgreater{} Relation \textless{} Add} & Menor.\\
+30 & \texttt{Relation -\textgreater{} Relation \textless{}= Add} & Menor o igual.\\
+31 & \texttt{Relation -\textgreater{} Relation \textgreater{} Add} & Mayor.\\
+32 & \texttt{Relation -\textgreater{} Relation \textgreater{}= Add} & Mayor o igual.\\
+33 & \texttt{Relation -\textgreater{} Add} & Paso a suma.\\
+34 & \texttt{Add -\textgreater{} Add + Mul} & Suma.\\
+35 & \texttt{Add -\textgreater{} Add - Mul} & Resta.\\
+36 & \texttt{Add -\textgreater{} Mul} & Paso a producto.\\
+37 & \texttt{Mul -\textgreater{} Mul * Unary} & Multiplicación.\\
+38 & \texttt{Mul -\textgreater{} Mul / Unary} & División.\\
+39 & \texttt{Mul -\textgreater{} Mul \% Unary} & Módulo entero.\\
+40 & \texttt{Mul -\textgreater{} Unary} & Paso a unario.\\
+41 & \texttt{Unary -\textgreater{} + Unary} & Positivo unario.\\
+42 & \texttt{Unary -\textgreater{} - Unary} & Negativo unario.\\
+43 & \texttt{Unary -\textgreater{} ! Unary} & Negación lógica.\\
+44 & \texttt{Unary -\textgreater{} Primary} & Paso a primario.\\
+45 & \texttt{Primary -\textgreater{} ID} & Uso de identificador.\\
+46 & \texttt{Primary -\textgreater{} INT} & Constante entera.\\
+47 & \texttt{Primary -\textgreater{} FLOAT} & Constante real.\\
+48 & \texttt{Primary -\textgreater{} CHAR} & Literal carácter.\\
+49 & \texttt{Primary -\textgreater{} STRING} & Literal cadena.\\
+50 & \texttt{Primary -\textgreater{} ( Expr )} & Agrupación explícita.\\
+\bottomrule\end{longtable}

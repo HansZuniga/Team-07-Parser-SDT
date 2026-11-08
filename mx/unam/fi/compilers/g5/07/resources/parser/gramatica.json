@@ -1,0 +1,422 @@
+[
+  {
+    "id": 0,
+    "lhs": "Start",
+    "rhs": [
+      "Program"
+    ]
+  },
+  {
+    "id": 1,
+    "lhs": "Program",
+    "rhs": [
+      "int",
+      "main",
+      "(",
+      ")",
+      "Block"
+    ]
+  },
+  {
+    "id": 2,
+    "lhs": "Block",
+    "rhs": [
+      "{",
+      "Items",
+      "}"
+    ]
+  },
+  {
+    "id": 3,
+    "lhs": "Items",
+    "rhs": [
+      "Items",
+      "Item"
+    ]
+  },
+  {
+    "id": 4,
+    "lhs": "Items",
+    "rhs": []
+  },
+  {
+    "id": 5,
+    "lhs": "Item",
+    "rhs": [
+      "Decl"
+    ]
+  },
+  {
+    "id": 6,
+    "lhs": "Item",
+    "rhs": [
+      "Stmt"
+    ]
+  },
+  {
+    "id": 7,
+    "lhs": "Decl",
+    "rhs": [
+      "Type",
+      "ID",
+      "Init",
+      ";"
+    ]
+  },
+  {
+    "id": 8,
+    "lhs": "Type",
+    "rhs": [
+      "int"
+    ]
+  },
+  {
+    "id": 9,
+    "lhs": "Type",
+    "rhs": [
+      "float"
+    ]
+  },
+  {
+    "id": 10,
+    "lhs": "Type",
+    "rhs": [
+      "char"
+    ]
+  },
+  {
+    "id": 11,
+    "lhs": "Init",
+    "rhs": [
+      "=",
+      "Expr"
+    ]
+  },
+  {
+    "id": 12,
+    "lhs": "Init",
+    "rhs": []
+  },
+  {
+    "id": 13,
+    "lhs": "Stmt",
+    "rhs": [
+      "Matched"
+    ]
+  },
+  {
+    "id": 14,
+    "lhs": "Stmt",
+    "rhs": [
+      "Unmatched"
+    ]
+  },
+  {
+    "id": 15,
+    "lhs": "Matched",
+    "rhs": [
+      "Simple"
+    ]
+  },
+  {
+    "id": 16,
+    "lhs": "Matched",
+    "rhs": [
+      "Block"
+    ]
+  },
+  {
+    "id": 17,
+    "lhs": "Matched",
+    "rhs": [
+      "if",
+      "(",
+      "Expr",
+      ")",
+      "Matched",
+      "else",
+      "Matched"
+    ]
+  },
+  {
+    "id": 18,
+    "lhs": "Matched",
+    "rhs": [
+      "while",
+      "(",
+      "Expr",
+      ")",
+      "Matched"
+    ]
+  },
+  {
+    "id": 19,
+    "lhs": "Unmatched",
+    "rhs": [
+      "if",
+      "(",
+      "Expr",
+      ")",
+      "Stmt"
+    ]
+  },
+  {
+    "id": 20,
+    "lhs": "Unmatched",
+    "rhs": [
+      "if",
+      "(",
+      "Expr",
+      ")",
+      "Matched",
+      "else",
+      "Unmatched"
+    ]
+  },
+  {
+    "id": 21,
+    "lhs": "Unmatched",
+    "rhs": [
+      "while",
+      "(",
+      "Expr",
+      ")",
+      "Unmatched"
+    ]
+  },
+  {
+    "id": 22,
+    "lhs": "Simple",
+    "rhs": [
+      "ID",
+      "=",
+      "Expr",
+      ";"
+    ]
+  },
+  {
+    "id": 23,
+    "lhs": "Simple",
+    "rhs": [
+      "return",
+      "Expr",
+      ";"
+    ]
+  },
+  {
+    "id": 24,
+    "lhs": "Simple",
+    "rhs": [
+      ";"
+    ]
+  },
+  {
+    "id": 25,
+    "lhs": "Expr",
+    "rhs": [
+      "Equality"
+    ]
+  },
+  {
+    "id": 26,
+    "lhs": "Equality",
+    "rhs": [
+      "Equality",
+      "==",
+      "Relation"
+    ]
+  },
+  {
+    "id": 27,
+    "lhs": "Equality",
+    "rhs": [
+      "Equality",
+      "!=",
+      "Relation"
+    ]
+  },
+  {
+    "id": 28,
+    "lhs": "Equality",
+    "rhs": [
+      "Relation"
+    ]
+  },
+  {
+    "id": 29,
+    "lhs": "Relation",
+    "rhs": [
+      "Relation",
+      "<",
+      "Add"
+    ]
+  },
+  {
+    "id": 30,
+    "lhs": "Relation",
+    "rhs": [
+      "Relation",
+      "<=",
+      "Add"
+    ]
+  },
+  {
+    "id": 31,
+    "lhs": "Relation",
+    "rhs": [
+      "Relation",
+      ">",
+      "Add"
+    ]
+  },
+  {
+    "id": 32,
+    "lhs": "Relation",
+    "rhs": [
+      "Relation",
+      ">=",
+      "Add"
+    ]
+  },
+  {
+    "id": 33,
+    "lhs": "Relation",
+    "rhs": [
+      "Add"
+    ]
+  },
+  {
+    "id": 34,
+    "lhs": "Add",
+    "rhs": [
+      "Add",
+      "+",
+      "Mul"
+    ]
+  },
+  {
+    "id": 35,
+    "lhs": "Add",
+    "rhs": [
+      "Add",
+      "-",
+      "Mul"
+    ]
+  },
+  {
+    "id": 36,
+    "lhs": "Add",
+    "rhs": [
+      "Mul"
+    ]
+  },
+  {
+    "id": 37,
+    "lhs": "Mul",
+    "rhs": [
+      "Mul",
+      "*",
+      "Unary"
+    ]
+  },
+  {
+    "id": 38,
+    "lhs": "Mul",
+    "rhs": [
+      "Mul",
+      "/",
+      "Unary"
+    ]
+  },
+  {
+    "id": 39,
+    "lhs": "Mul",
+    "rhs": [
+      "Mul",
+      "%",
+      "Unary"
+    ]
+  },
+  {
+    "id": 40,
+    "lhs": "Mul",
+    "rhs": [
+      "Unary"
+    ]
+  },
+  {
+    "id": 41,
+    "lhs": "Unary",
+    "rhs": [
+      "+",
+      "Unary"
+    ]
+  },
+  {
+    "id": 42,
+    "lhs": "Unary",
+    "rhs": [
+      "-",
+      "Unary"
+    ]
+  },
+  {
+    "id": 43,
+    "lhs": "Unary",
+    "rhs": [
+      "!",
+      "Unary"
+    ]
+  },
+  {
+    "id": 44,
+    "lhs": "Unary",
+    "rhs": [
+      "Primary"
+    ]
+  },
+  {
+    "id": 45,
+    "lhs": "Primary",
+    "rhs": [
+      "ID"
+    ]
+  },
+  {
+    "id": 46,
+    "lhs": "Primary",
+    "rhs": [
+      "INT"
+    ]
+  },
+  {
+    "id": 47,
+    "lhs": "Primary",
+    "rhs": [
+      "FLOAT"
+    ]
+  },
+  {
+    "id": 48,
+    "lhs": "Primary",
+    "rhs": [
+      "CHAR"
+    ]
+  },
+  {
+    "id": 49,
+    "lhs": "Primary",
+    "rhs": [
+      "STRING"
+    ]
+  },
+  {
+    "id": 50,
+    "lhs": "Primary",
+    "rhs": [
+      "(",
+      "Expr",
+      ")"
+    ]
+  }
+]

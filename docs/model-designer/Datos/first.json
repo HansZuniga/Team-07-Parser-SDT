@@ -1,0 +1,147 @@
+{
+  "Add": [
+    "!",
+    "(",
+    "+",
+    "-",
+    "CHAR",
+    "FLOAT",
+    "ID",
+    "INT",
+    "STRING"
+  ],
+  "Block": [
+    "{"
+  ],
+  "Decl": [
+    "char",
+    "float",
+    "int"
+  ],
+  "Equality": [
+    "!",
+    "(",
+    "+",
+    "-",
+    "CHAR",
+    "FLOAT",
+    "ID",
+    "INT",
+    "STRING"
+  ],
+  "Expr": [
+    "!",
+    "(",
+    "+",
+    "-",
+    "CHAR",
+    "FLOAT",
+    "ID",
+    "INT",
+    "STRING"
+  ],
+  "Init": [
+    "<epsilon>",
+    "="
+  ],
+  "Item": [
+    ";",
+    "ID",
+    "char",
+    "float",
+    "if",
+    "int",
+    "return",
+    "while",
+    "{"
+  ],
+  "Items": [
+    ";",
+    "<epsilon>",
+    "ID",
+    "char",
+    "float",
+    "if",
+    "int",
+    "return",
+    "while",
+    "{"
+  ],
+  "Matched": [
+    ";",
+    "ID",
+    "if",
+    "return",
+    "while",
+    "{"
+  ],
+  "Mul": [
+    "!",
+    "(",
+    "+",
+    "-",
+    "CHAR",
+    "FLOAT",
+    "ID",
+    "INT",
+    "STRING"
+  ],
+  "Primary": [
+    "(",
+    "CHAR",
+    "FLOAT",
+    "ID",
+    "INT",
+    "STRING"
+  ],
+  "Program": [
+    "int"
+  ],
+  "Relation": [
+    "!",
+    "(",
+    "+",
+    "-",
+    "CHAR",
+    "FLOAT",
+    "ID",
+    "INT",
+    "STRING"
+  ],
+  "Simple": [
+    ";",
+    "ID",
+    "return"
+  ],
+  "Start": [
+    "int"
+  ],
+  "Stmt": [
+    ";",
+    "ID",
+    "if",
+    "return",
+    "while",
+    "{"
+  ],
+  "Type": [
+    "char",
+    "float",
+    "int"
+  ],
+  "Unary": [
+    "!",
+    "(",
+    "+",
+    "-",
+    "CHAR",
+    "FLOAT",
+    "ID",
+    "INT",
+    "STRING"
+  ],
+  "Unmatched": [
+    "if",
+    "while"
+  ]
+}

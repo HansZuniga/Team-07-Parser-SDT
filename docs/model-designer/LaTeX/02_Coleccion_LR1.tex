@@ -1,0 +1,408 @@
+\input{estilo.tex}
+\begin{document}
+\titulo{2. Colección canónica LR(1)}
+\section*{Reglas de construcción}
+Un ítem es $[A\to\alpha\cdot\beta,a]$. En los datos se representa como \texttt{[produccion, posicion, lookahead]}; la posición indica cuántos símbolos del RHS están antes del punto.
+\[
+I_0=\operatorname{CLOSURE}(\{[\texttt{Start}\to\cdot\texttt{Program},\$]\}).
+\]
+Para $[A\to\alpha\cdot B\beta,a]$, CLOSURE agrega $[B\to\cdot\gamma,b]$ por cada producción $B\to\gamma$ y cada $b\in\operatorname{FIRST}(\beta a)$. Repetir hasta no agregar ítems. GOTO mueve el punto sobre el símbolo y cierra el resultado. Solo se crea un estado nuevo si el conjunto completo de ítems LR(1) es distinto.
+
+\begin{lstlisting}
+I0 = { [Start -> . Program, $],
+       [Program -> . int main ( ) Block, $] }
+GOTO(I0, int) = I2
+GOTO(I0, Program) = I1
+I1 = { [Start -> Program ., $] }  // aceptacion
+\end{lstlisting}
+En I28 aparece \texttt{Decl -> Type ID . Init ;}. CLOSURE usa $\operatorname{FIRST}(\texttt{;}a)=\{\texttt{;}\}$ y agrega \texttt{Init -> . = Expr} e \texttt{Init -> .}, ambos con lookahead \texttt{;}.
+\section*{Elección de CLR(1)}
+Se mantiene el método acordado: construir la colección canónica, calcular FIRST($\beta a$) y conservar los lookaheads de cada estado. No se fusionan estados por núcleo LR(0). La colección mantiene los lookaheads propios de cada estado, conforme al método CLR(1) acordado para el proyecto.
+\section*{Resultado}
+161 estados alcanzables y distintos; 730 transiciones. El ítem de aceptación está en I1. Un ítem con posición igual a la longitud del RHS está completo; p0 es aceptación y las demás producciones generan reducciones bajo su lookahead.
+
+
+\clearpage
+\section*{Ejemplo de CLOSURE y GOTO en I28}
+Se parte del ítem \texttt{[Decl -> Type ID . Init ;, a]}. El no terminal después del punto es Init; la secuencia que queda después de él es \texttt{;}. Por tanto:
+\[
+B=\texttt{Init},\qquad\beta=\texttt{;},\qquad
+\operatorname{FIRST}(\beta a)=\operatorname{FIRST}(\texttt{;}a)=\{\texttt{;}\}.
+\]
+\begin{enumerate}
+\item Consultar las dos producciones de Init: p11 y p12.
+\item Agregar \texttt{[Init -> . = Expr, ;]} y \texttt{[Init -> ., ;]}.
+\item El primer ítem permite avanzar con \texttt{=} hasta I49. El segundo ya está completo porque p12 tiene RHS vacío: permite reducir únicamente ante \texttt{;}.
+\item Al reconocer Init, GOTO(I28,Init) lleva a I50 y el ítem de Decl queda como \texttt{Decl -> Type ID Init . ;}.
+\end{enumerate}
+La anticipación \texttt{;} de los ítems añadidos proviene de FIRST($\beta a$). No se obtiene copiando sin más \texttt{a}, ni calculando FOLLOW(Init).
+\section*{Qué pasa si la secuencia puede ser vacía}
+Al entrar al bloque, I7 contiene \texttt{[Block -> \{ . Items \}, \$]}. Al expandir Items se usa FIRST de \texttt{\}\$}, cuyo único inicio es \texttt{\}}. Por eso aparecen inicialmente ítems de Items con ese lookahead.
+
+Después, \texttt{[Items -> . Items Item, \}]} vuelve a expandir Items. Esta vez se calcula FIRST(\texttt{Item}\texttt{\}}): se añaden los posibles inicios de Item. La repetición de CLOSURE reúne todos esos contextos hasta llegar al punto fijo. Si una secuencia $\beta$ es anulable, el cálculo debe continuar hasta \texttt{a}; si $\beta$ está vacía, FIRST($\beta a$) es \{a\}.
+\section*{Por qué no se eliminan estados de igual núcleo}
+I9 e I122 contienen el mismo núcleo \texttt{Simple -> ; .}. Sin embargo, I122 incluye el lookahead \texttt{else} e I9 no. En I122 se puede reducir p24 al ver else; en I9 esa reducción no está autorizada. Son estados CLR(1) distintos, aunque su parte LR(0) coincida.
+\section*{Cómo leer la colección compacta}
+\texttt{(12,0,L3)*} significa p12, punto en posición cero y todos los lookaheads de L3. Como p12 es vacía y L3 contiene solo \texttt{;}, equivale a \texttt{[Init -> ., ;]}. El asterisco marca que está completo. En cambio, \texttt{(7,2,L1)} tiene dos símbolos reconocidos de \texttt{Decl -> Type ID Init ;}: el punto está después de ID.
+
+Los conjuntos L0--L13 solo evitan repetir listas de lookaheads en el documento. Cada estado sigue representando su conjunto completo de ítems LR(1), sin fusión de estados.
+\clearpage
+\section*{FIRST calculados}
+{\small\begin{longtable}{@{}p{4.5cm}p{11cm}@{}}\toprule No terminal(es)& FIRST\\\midrule\endhead
+\texttt{Add, Equality, Expr, Mul, Relation, Unary} & \texttt{!, (, +, -, CHAR, FLOAT, ID, INT, STRING}\\
+\texttt{Block} & \texttt{\{}\\
+\texttt{Decl, Type} & \texttt{char, float, int}\\
+\texttt{Init} & \texttt{epsilon, =}\\
+\texttt{Item} & \texttt{;, ID, char, float, if, int, return, while, \{}\\
+\texttt{Items} & \texttt{;, epsilon, ID, char, float, if, int, return, while, \{}\\
+\texttt{Matched, Stmt} & \texttt{;, ID, if, return, while, \{}\\
+\texttt{Primary} & \texttt{(, CHAR, FLOAT, ID, INT, STRING}\\
+\texttt{Program, Start} & \texttt{int}\\
+\texttt{Simple} & \texttt{;, ID, return}\\
+\texttt{Unmatched} & \texttt{if, while}\\
+\bottomrule\end{longtable}}
+\section*{Colección completa en notación compacta}
+La terna \texttt{(p,d,Lk)} representa los ítems \texttt{[p,d,a]} para todos los lookaheads \texttt{a} del conjunto \texttt{Lk}. Por ejemplo, \texttt{(0,0,L0)} usa p0 y el punto al inicio. Agrupar lookaheads dentro de un mismo estado es solo notación: no fusiona estados CLR(1). Los IDs de producción son los del documento 1. El asterisco identifica un ítem completo; en I1 corresponde a aceptación.
+{\small\begin{longtable}{@{}p{1.3cm}p{14.2cm}@{}}\toprule Alias & Lookaheads\\\midrule\endhead
+\texttt{L0} & \texttt{\$}\\
+\texttt{L1} & \texttt{;, ID, char, float, if, int, return, while, \{, \}}\\
+\texttt{L2} & \texttt{ID}\\
+\texttt{L3} & \texttt{;}\\
+\texttt{L4} & \texttt{!=, ;, ==}\\
+\texttt{L5} & \texttt{!=, ;, \textless{}, \textless{}=, ==, \textgreater{}, \textgreater{}=}\\
+\texttt{L6} & \texttt{!=, +, -, ;, \textless{}, \textless{}=, ==, \textgreater{}, \textgreater{}=}\\
+\texttt{L7} & \texttt{!=, \%, *, +, -, /, ;, \textless{}, \textless{}=, ==, \textgreater{}, \textgreater{}=}\\
+\texttt{L8} & \texttt{)}\\
+\texttt{L9} & \texttt{!=, ), ==}\\
+\texttt{L10} & \texttt{!=, ), \textless{}, \textless{}=, ==, \textgreater{}, \textgreater{}=}\\
+\texttt{L11} & \texttt{!=, ), +, -, \textless{}, \textless{}=, ==, \textgreater{}, \textgreater{}=}\\
+\texttt{L12} & \texttt{!=, \%, ), *, +, -, /, \textless{}, \textless{}=, ==, \textgreater{}, \textgreater{}=}\\
+\texttt{L13} & \texttt{;, ID, char, else, float, if, int, return, while, \{, \}}\\
+\bottomrule\end{longtable}}
+{\small\begin{longtable}{@{}r p{14.7cm}@{}}\toprule Estado & Ítems: (producción, posición, conjunto de lookaheads)\\\midrule\endhead
+I0 & \texttt{(0,0,L0)}; \texttt{(1,0,L0)}\\\addlinespace[3pt]
+I1 & \texttt{(0,1,L0)*}\\\addlinespace[3pt]
+I2 & \texttt{(1,1,L0)}\\\addlinespace[3pt]
+I3 & \texttt{(1,2,L0)}\\\addlinespace[3pt]
+I4 & \texttt{(1,3,L0)}\\\addlinespace[3pt]
+I5 & \texttt{(1,4,L0)}; \texttt{(2,0,L0)}\\\addlinespace[3pt]
+I6 & \texttt{(1,5,L0)*}\\\addlinespace[3pt]
+I7 & \texttt{(2,1,L0)}; \texttt{(3,0,L1)}; \texttt{(4,0,L1)*}\\\addlinespace[3pt]
+I8 & \texttt{(2,0,L1)}; \texttt{(2,2,L0)}; \texttt{(3,1,L1)}; \texttt{(5,0,L1)}; \texttt{(6,0,L1)}; \texttt{(7,0,L1)}; \texttt{(8,0,L2)}; \texttt{(9,0,L2)}; \texttt{(10,0,L2)}; \texttt{(13,0,L1)}; \texttt{(14,0,L1)}; \texttt{(15,0,L1)}; \texttt{(16,0,L1)}; \texttt{(17,0,L1)}; \texttt{(18,0,L1)}; \texttt{(19,0,L1)}; \texttt{(20,0,L1)}; \texttt{(21,0,L1)}; \texttt{(22,0,L1)}; \texttt{(23,0,L1)}; \texttt{(24,0,L1)}\\\addlinespace[3pt]
+I9 & \texttt{(24,1,L1)*}\\\addlinespace[3pt]
+I10 & \texttt{(16,1,L1)*}\\\addlinespace[3pt]
+I11 & \texttt{(5,1,L1)*}\\\addlinespace[3pt]
+I12 & \texttt{(22,1,L1)}\\\addlinespace[3pt]
+I13 & \texttt{(3,2,L1)*}\\\addlinespace[3pt]
+I14 & \texttt{(13,1,L1)*}\\\addlinespace[3pt]
+I15 & \texttt{(15,1,L1)*}\\\addlinespace[3pt]
+I16 & \texttt{(6,1,L1)*}\\\addlinespace[3pt]
+I17 & \texttt{(7,1,L1)}\\\addlinespace[3pt]
+I18 & \texttt{(14,1,L1)*}\\\addlinespace[3pt]
+I19 & \texttt{(10,1,L2)*}\\\addlinespace[3pt]
+I20 & \texttt{(9,1,L2)*}\\\addlinespace[3pt]
+I21 & \texttt{(17,1,L1)}; \texttt{(19,1,L1)}; \texttt{(20,1,L1)}\\\addlinespace[3pt]
+I22 & \texttt{(8,1,L2)*}\\\addlinespace[3pt]
+I23 & \texttt{(23,1,L1)}; \texttt{(25,0,L3)}; \texttt{(26,0,L4)}; \texttt{(27,0,L4)}; \texttt{(28,0,L4)}; \texttt{(29,0,L5)}; \texttt{(30,0,L5)}; \texttt{(31,0,L5)}; \texttt{(32,0,L5)}; \texttt{(33,0,L5)}; \texttt{(34,0,L6)}; \texttt{(35,0,L6)}; \texttt{(36,0,L6)}; \texttt{(37,0,L7)}; \texttt{(38,0,L7)}; \texttt{(39,0,L7)}; \texttt{(40,0,L7)}; \texttt{(41,0,L7)}; \texttt{(42,0,L7)}; \texttt{(43,0,L7)}; \texttt{(44,0,L7)}; \texttt{(45,0,L7)}; \texttt{(46,0,L7)}; \texttt{(47,0,L7)}; \texttt{(48,0,L7)}; \texttt{(49,0,L7)}; \texttt{(50,0,L7)}\\\addlinespace[3pt]
+I24 & \texttt{(18,1,L1)}; \texttt{(21,1,L1)}\\\addlinespace[3pt]
+I25 & \texttt{(2,1,L1)}; \texttt{(3,0,L1)}; \texttt{(4,0,L1)*}\\\addlinespace[3pt]
+I26 & \texttt{(2,3,L0)*}\\\addlinespace[3pt]
+I27 & \texttt{(22,2,L1)}; \texttt{(25,0,L3)}; \texttt{(26,0,L4)}; \texttt{(27,0,L4)}; \texttt{(28,0,L4)}; \texttt{(29,0,L5)}; \texttt{(30,0,L5)}; \texttt{(31,0,L5)}; \texttt{(32,0,L5)}; \texttt{(33,0,L5)}; \texttt{(34,0,L6)}; \texttt{(35,0,L6)}; \texttt{(36,0,L6)}; \texttt{(37,0,L7)}; \texttt{(38,0,L7)}; \texttt{(39,0,L7)}; \texttt{(40,0,L7)}; \texttt{(41,0,L7)}; \texttt{(42,0,L7)}; \texttt{(43,0,L7)}; \texttt{(44,0,L7)}; \texttt{(45,0,L7)}; \texttt{(46,0,L7)}; \texttt{(47,0,L7)}; \texttt{(48,0,L7)}; \texttt{(49,0,L7)}; \texttt{(50,0,L7)}\\\addlinespace[3pt]
+I28 & \texttt{(7,2,L1)}; \texttt{(11,0,L3)}; \texttt{(12,0,L3)*}\\\addlinespace[3pt]
+I29 & \texttt{(17,2,L1)}; \texttt{(19,2,L1)}; \texttt{(20,2,L1)}; \texttt{(25,0,L8)}; \texttt{(26,0,L9)}; \texttt{(27,0,L9)}; \texttt{(28,0,L9)}; \texttt{(29,0,L10)}; \texttt{(30,0,L10)}; \texttt{(31,0,L10)}; \texttt{(32,0,L10)}; \texttt{(33,0,L10)}; \texttt{(34,0,L11)}; \texttt{(35,0,L11)}; \texttt{(36,0,L11)}; \texttt{(37,0,L12)}; \texttt{(38,0,L12)}; \texttt{(39,0,L12)}; \texttt{(40,0,L12)}; \texttt{(41,0,L12)}; \texttt{(42,0,L12)}; \texttt{(43,0,L12)}; \texttt{(44,0,L12)}; \texttt{(45,0,L12)}; \texttt{(46,0,L12)}; \texttt{(47,0,L12)}; \texttt{(48,0,L12)}; \texttt{(49,0,L12)}; \texttt{(50,0,L12)}\\\addlinespace[3pt]
+I30 & \texttt{(41,0,L7)}; \texttt{(42,0,L7)}; \texttt{(43,0,L7)}; \texttt{(43,1,L7)}; \texttt{(44,0,L7)}; \texttt{(45,0,L7)}; \texttt{(46,0,L7)}; \texttt{(47,0,L7)}; \texttt{(48,0,L7)}; \texttt{(49,0,L7)}; \texttt{(50,0,L7)}\\\addlinespace[3pt]
+I31 & \texttt{(25,0,L8)}; \texttt{(26,0,L9)}; \texttt{(27,0,L9)}; \texttt{(28,0,L9)}; \texttt{(29,0,L10)}; \texttt{(30,0,L10)}; \texttt{(31,0,L10)}; \texttt{(32,0,L10)}; \texttt{(33,0,L10)}; \texttt{(34,0,L11)}; \texttt{(35,0,L11)}; \texttt{(36,0,L11)}; \texttt{(37,0,L12)}; \texttt{(38,0,L12)}; \texttt{(39,0,L12)}; \texttt{(40,0,L12)}; \texttt{(41,0,L12)}; \texttt{(42,0,L12)}; \texttt{(43,0,L12)}; \texttt{(44,0,L12)}; \texttt{(45,0,L12)}; \texttt{(46,0,L12)}; \texttt{(47,0,L12)}; \texttt{(48,0,L12)}; \texttt{(49,0,L12)}; \texttt{(50,0,L12)}; \texttt{(50,1,L7)}\\\addlinespace[3pt]
+I32 & \texttt{(41,0,L7)}; \texttt{(41,1,L7)}; \texttt{(42,0,L7)}; \texttt{(43,0,L7)}; \texttt{(44,0,L7)}; \texttt{(45,0,L7)}; \texttt{(46,0,L7)}; \texttt{(47,0,L7)}; \texttt{(48,0,L7)}; \texttt{(49,0,L7)}; \texttt{(50,0,L7)}\\\addlinespace[3pt]
+I33 & \texttt{(41,0,L7)}; \texttt{(42,0,L7)}; \texttt{(42,1,L7)}; \texttt{(43,0,L7)}; \texttt{(44,0,L7)}; \texttt{(45,0,L7)}; \texttt{(46,0,L7)}; \texttt{(47,0,L7)}; \texttt{(48,0,L7)}; \texttt{(49,0,L7)}; \texttt{(50,0,L7)}\\\addlinespace[3pt]
+I34 & \texttt{(33,1,L5)*}; \texttt{(34,1,L6)}; \texttt{(35,1,L6)}\\\addlinespace[3pt]
+I35 & \texttt{(48,1,L7)*}\\\addlinespace[3pt]
+I36 & \texttt{(25,1,L3)*}; \texttt{(26,1,L4)}; \texttt{(27,1,L4)}\\\addlinespace[3pt]
+I37 & \texttt{(23,2,L1)}\\\addlinespace[3pt]
+I38 & \texttt{(47,1,L7)*}\\\addlinespace[3pt]
+I39 & \texttt{(45,1,L7)*}\\\addlinespace[3pt]
+I40 & \texttt{(46,1,L7)*}\\\addlinespace[3pt]
+I41 & \texttt{(36,1,L6)*}; \texttt{(37,1,L7)}; \texttt{(38,1,L7)}; \texttt{(39,1,L7)}\\\addlinespace[3pt]
+I42 & \texttt{(44,1,L7)*}\\\addlinespace[3pt]
+I43 & \texttt{(28,1,L4)*}; \texttt{(29,1,L5)}; \texttt{(30,1,L5)}; \texttt{(31,1,L5)}; \texttt{(32,1,L5)}\\\addlinespace[3pt]
+I44 & \texttt{(49,1,L7)*}\\\addlinespace[3pt]
+I45 & \texttt{(40,1,L7)*}\\\addlinespace[3pt]
+I46 & \texttt{(18,2,L1)}; \texttt{(21,2,L1)}; \texttt{(25,0,L8)}; \texttt{(26,0,L9)}; \texttt{(27,0,L9)}; \texttt{(28,0,L9)}; \texttt{(29,0,L10)}; \texttt{(30,0,L10)}; \texttt{(31,0,L10)}; \texttt{(32,0,L10)}; \texttt{(33,0,L10)}; \texttt{(34,0,L11)}; \texttt{(35,0,L11)}; \texttt{(36,0,L11)}; \texttt{(37,0,L12)}; \texttt{(38,0,L12)}; \texttt{(39,0,L12)}; \texttt{(40,0,L12)}; \texttt{(41,0,L12)}; \texttt{(42,0,L12)}; \texttt{(43,0,L12)}; \texttt{(44,0,L12)}; \texttt{(45,0,L12)}; \texttt{(46,0,L12)}; \texttt{(47,0,L12)}; \texttt{(48,0,L12)}; \texttt{(49,0,L12)}; \texttt{(50,0,L12)}\\\addlinespace[3pt]
+I47 & \texttt{(2,0,L1)}; \texttt{(2,2,L1)}; \texttt{(3,1,L1)}; \texttt{(5,0,L1)}; \texttt{(6,0,L1)}; \texttt{(7,0,L1)}; \texttt{(8,0,L2)}; \texttt{(9,0,L2)}; \texttt{(10,0,L2)}; \texttt{(13,0,L1)}; \texttt{(14,0,L1)}; \texttt{(15,0,L1)}; \texttt{(16,0,L1)}; \texttt{(17,0,L1)}; \texttt{(18,0,L1)}; \texttt{(19,0,L1)}; \texttt{(20,0,L1)}; \texttt{(21,0,L1)}; \texttt{(22,0,L1)}; \texttt{(23,0,L1)}; \texttt{(24,0,L1)}\\\addlinespace[3pt]
+I48 & \texttt{(22,3,L1)}\\\addlinespace[3pt]
+I49 & \texttt{(11,1,L3)}; \texttt{(25,0,L3)}; \texttt{(26,0,L4)}; \texttt{(27,0,L4)}; \texttt{(28,0,L4)}; \texttt{(29,0,L5)}; \texttt{(30,0,L5)}; \texttt{(31,0,L5)}; \texttt{(32,0,L5)}; \texttt{(33,0,L5)}; \texttt{(34,0,L6)}; \texttt{(35,0,L6)}; \texttt{(36,0,L6)}; \texttt{(37,0,L7)}; \texttt{(38,0,L7)}; \texttt{(39,0,L7)}; \texttt{(40,0,L7)}; \texttt{(41,0,L7)}; \texttt{(42,0,L7)}; \texttt{(43,0,L7)}; \texttt{(44,0,L7)}; \texttt{(45,0,L7)}; \texttt{(46,0,L7)}; \texttt{(47,0,L7)}; \texttt{(48,0,L7)}; \texttt{(49,0,L7)}; \texttt{(50,0,L7)}\\\addlinespace[3pt]
+I50 & \texttt{(7,3,L1)}\\\addlinespace[3pt]
+I51 & \texttt{(41,0,L12)}; \texttt{(42,0,L12)}; \texttt{(43,0,L12)}; \texttt{(43,1,L12)}; \texttt{(44,0,L12)}; \texttt{(45,0,L12)}; \texttt{(46,0,L12)}; \texttt{(47,0,L12)}; \texttt{(48,0,L12)}; \texttt{(49,0,L12)}; \texttt{(50,0,L12)}\\\addlinespace[3pt]
+I52 & \texttt{(25,0,L8)}; \texttt{(26,0,L9)}; \texttt{(27,0,L9)}; \texttt{(28,0,L9)}; \texttt{(29,0,L10)}; \texttt{(30,0,L10)}; \texttt{(31,0,L10)}; \texttt{(32,0,L10)}; \texttt{(33,0,L10)}; \texttt{(34,0,L11)}; \texttt{(35,0,L11)}; \texttt{(36,0,L11)}; \texttt{(37,0,L12)}; \texttt{(38,0,L12)}; \texttt{(39,0,L12)}; \texttt{(40,0,L12)}; \texttt{(41,0,L12)}; \texttt{(42,0,L12)}; \texttt{(43,0,L12)}; \texttt{(44,0,L12)}; \texttt{(45,0,L12)}; \texttt{(46,0,L12)}; \texttt{(47,0,L12)}; \texttt{(48,0,L12)}; \texttt{(49,0,L12)}; \texttt{(50,0,L12)}; \texttt{(50,1,L12)}\\\addlinespace[3pt]
+I53 & \texttt{(41,0,L12)}; \texttt{(41,1,L12)}; \texttt{(42,0,L12)}; \texttt{(43,0,L12)}; \texttt{(44,0,L12)}; \texttt{(45,0,L12)}; \texttt{(46,0,L12)}; \texttt{(47,0,L12)}; \texttt{(48,0,L12)}; \texttt{(49,0,L12)}; \texttt{(50,0,L12)}\\\addlinespace[3pt]
+I54 & \texttt{(41,0,L12)}; \texttt{(42,0,L12)}; \texttt{(42,1,L12)}; \texttt{(43,0,L12)}; \texttt{(44,0,L12)}; \texttt{(45,0,L12)}; \texttt{(46,0,L12)}; \texttt{(47,0,L12)}; \texttt{(48,0,L12)}; \texttt{(49,0,L12)}; \texttt{(50,0,L12)}\\\addlinespace[3pt]
+I55 & \texttt{(33,1,L10)*}; \texttt{(34,1,L11)}; \texttt{(35,1,L11)}\\\addlinespace[3pt]
+I56 & \texttt{(48,1,L12)*}\\\addlinespace[3pt]
+I57 & \texttt{(25,1,L8)*}; \texttt{(26,1,L9)}; \texttt{(27,1,L9)}\\\addlinespace[3pt]
+I58 & \texttt{(17,3,L1)}; \texttt{(19,3,L1)}; \texttt{(20,3,L1)}\\\addlinespace[3pt]
+I59 & \texttt{(47,1,L12)*}\\\addlinespace[3pt]
+I60 & \texttt{(45,1,L12)*}\\\addlinespace[3pt]
+I61 & \texttt{(46,1,L12)*}\\\addlinespace[3pt]
+I62 & \texttt{(36,1,L11)*}; \texttt{(37,1,L12)}; \texttt{(38,1,L12)}; \texttt{(39,1,L12)}\\\addlinespace[3pt]
+I63 & \texttt{(44,1,L12)*}\\\addlinespace[3pt]
+I64 & \texttt{(28,1,L9)*}; \texttt{(29,1,L10)}; \texttt{(30,1,L10)}; \texttt{(31,1,L10)}; \texttt{(32,1,L10)}\\\addlinespace[3pt]
+I65 & \texttt{(49,1,L12)*}\\\addlinespace[3pt]
+I66 & \texttt{(40,1,L12)*}\\\addlinespace[3pt]
+I67 & \texttt{(43,2,L7)*}\\\addlinespace[3pt]
+I68 & \texttt{(50,2,L7)}\\\addlinespace[3pt]
+I69 & \texttt{(41,2,L7)*}\\\addlinespace[3pt]
+I70 & \texttt{(42,2,L7)*}\\\addlinespace[3pt]
+I71 & \texttt{(34,2,L6)}; \texttt{(37,0,L7)}; \texttt{(38,0,L7)}; \texttt{(39,0,L7)}; \texttt{(40,0,L7)}; \texttt{(41,0,L7)}; \texttt{(42,0,L7)}; \texttt{(43,0,L7)}; \texttt{(44,0,L7)}; \texttt{(45,0,L7)}; \texttt{(46,0,L7)}; \texttt{(47,0,L7)}; \texttt{(48,0,L7)}; \texttt{(49,0,L7)}; \texttt{(50,0,L7)}\\\addlinespace[3pt]
+I72 & \texttt{(35,2,L6)}; \texttt{(37,0,L7)}; \texttt{(38,0,L7)}; \texttt{(39,0,L7)}; \texttt{(40,0,L7)}; \texttt{(41,0,L7)}; \texttt{(42,0,L7)}; \texttt{(43,0,L7)}; \texttt{(44,0,L7)}; \texttt{(45,0,L7)}; \texttt{(46,0,L7)}; \texttt{(47,0,L7)}; \texttt{(48,0,L7)}; \texttt{(49,0,L7)}; \texttt{(50,0,L7)}\\\addlinespace[3pt]
+I73 & \texttt{(27,2,L4)}; \texttt{(29,0,L5)}; \texttt{(30,0,L5)}; \texttt{(31,0,L5)}; \texttt{(32,0,L5)}; \texttt{(33,0,L5)}; \texttt{(34,0,L6)}; \texttt{(35,0,L6)}; \texttt{(36,0,L6)}; \texttt{(37,0,L7)}; \texttt{(38,0,L7)}; \texttt{(39,0,L7)}; \texttt{(40,0,L7)}; \texttt{(41,0,L7)}; \texttt{(42,0,L7)}; \texttt{(43,0,L7)}; \texttt{(44,0,L7)}; \texttt{(45,0,L7)}; \texttt{(46,0,L7)}; \texttt{(47,0,L7)}; \texttt{(48,0,L7)}; \texttt{(49,0,L7)}; \texttt{(50,0,L7)}\\\addlinespace[3pt]
+I74 & \texttt{(26,2,L4)}; \texttt{(29,0,L5)}; \texttt{(30,0,L5)}; \texttt{(31,0,L5)}; \texttt{(32,0,L5)}; \texttt{(33,0,L5)}; \texttt{(34,0,L6)}; \texttt{(35,0,L6)}; \texttt{(36,0,L6)}; \texttt{(37,0,L7)}; \texttt{(38,0,L7)}; \texttt{(39,0,L7)}; \texttt{(40,0,L7)}; \texttt{(41,0,L7)}; \texttt{(42,0,L7)}; \texttt{(43,0,L7)}; \texttt{(44,0,L7)}; \texttt{(45,0,L7)}; \texttt{(46,0,L7)}; \texttt{(47,0,L7)}; \texttt{(48,0,L7)}; \texttt{(49,0,L7)}; \texttt{(50,0,L7)}\\\addlinespace[3pt]
+I75 & \texttt{(23,3,L1)*}\\\addlinespace[3pt]
+I76 & \texttt{(39,2,L7)}; \texttt{(41,0,L7)}; \texttt{(42,0,L7)}; \texttt{(43,0,L7)}; \texttt{(44,0,L7)}; \texttt{(45,0,L7)}; \texttt{(46,0,L7)}; \texttt{(47,0,L7)}; \texttt{(48,0,L7)}; \texttt{(49,0,L7)}; \texttt{(50,0,L7)}\\\addlinespace[3pt]
+I77 & \texttt{(37,2,L7)}; \texttt{(41,0,L7)}; \texttt{(42,0,L7)}; \texttt{(43,0,L7)}; \texttt{(44,0,L7)}; \texttt{(45,0,L7)}; \texttt{(46,0,L7)}; \texttt{(47,0,L7)}; \texttt{(48,0,L7)}; \texttt{(49,0,L7)}; \texttt{(50,0,L7)}\\\addlinespace[3pt]
+I78 & \texttt{(38,2,L7)}; \texttt{(41,0,L7)}; \texttt{(42,0,L7)}; \texttt{(43,0,L7)}; \texttt{(44,0,L7)}; \texttt{(45,0,L7)}; \texttt{(46,0,L7)}; \texttt{(47,0,L7)}; \texttt{(48,0,L7)}; \texttt{(49,0,L7)}; \texttt{(50,0,L7)}\\\addlinespace[3pt]
+I79 & \texttt{(29,2,L5)}; \texttt{(34,0,L6)}; \texttt{(35,0,L6)}; \texttt{(36,0,L6)}; \texttt{(37,0,L7)}; \texttt{(38,0,L7)}; \texttt{(39,0,L7)}; \texttt{(40,0,L7)}; \texttt{(41,0,L7)}; \texttt{(42,0,L7)}; \texttt{(43,0,L7)}; \texttt{(44,0,L7)}; \texttt{(45,0,L7)}; \texttt{(46,0,L7)}; \texttt{(47,0,L7)}; \texttt{(48,0,L7)}; \texttt{(49,0,L7)}; \texttt{(50,0,L7)}\\\addlinespace[3pt]
+I80 & \texttt{(30,2,L5)}; \texttt{(34,0,L6)}; \texttt{(35,0,L6)}; \texttt{(36,0,L6)}; \texttt{(37,0,L7)}; \texttt{(38,0,L7)}; \texttt{(39,0,L7)}; \texttt{(40,0,L7)}; \texttt{(41,0,L7)}; \texttt{(42,0,L7)}; \texttt{(43,0,L7)}; \texttt{(44,0,L7)}; \texttt{(45,0,L7)}; \texttt{(46,0,L7)}; \texttt{(47,0,L7)}; \texttt{(48,0,L7)}; \texttt{(49,0,L7)}; \texttt{(50,0,L7)}\\\addlinespace[3pt]
+I81 & \texttt{(31,2,L5)}; \texttt{(34,0,L6)}; \texttt{(35,0,L6)}; \texttt{(36,0,L6)}; \texttt{(37,0,L7)}; \texttt{(38,0,L7)}; \texttt{(39,0,L7)}; \texttt{(40,0,L7)}; \texttt{(41,0,L7)}; \texttt{(42,0,L7)}; \texttt{(43,0,L7)}; \texttt{(44,0,L7)}; \texttt{(45,0,L7)}; \texttt{(46,0,L7)}; \texttt{(47,0,L7)}; \texttt{(48,0,L7)}; \texttt{(49,0,L7)}; \texttt{(50,0,L7)}\\\addlinespace[3pt]
+I82 & \texttt{(32,2,L5)}; \texttt{(34,0,L6)}; \texttt{(35,0,L6)}; \texttt{(36,0,L6)}; \texttt{(37,0,L7)}; \texttt{(38,0,L7)}; \texttt{(39,0,L7)}; \texttt{(40,0,L7)}; \texttt{(41,0,L7)}; \texttt{(42,0,L7)}; \texttt{(43,0,L7)}; \texttt{(44,0,L7)}; \texttt{(45,0,L7)}; \texttt{(46,0,L7)}; \texttt{(47,0,L7)}; \texttt{(48,0,L7)}; \texttt{(49,0,L7)}; \texttt{(50,0,L7)}\\\addlinespace[3pt]
+I83 & \texttt{(18,3,L1)}; \texttt{(21,3,L1)}\\\addlinespace[3pt]
+I84 & \texttt{(2,3,L1)*}\\\addlinespace[3pt]
+I85 & \texttt{(22,4,L1)*}\\\addlinespace[3pt]
+I86 & \texttt{(11,2,L3)*}\\\addlinespace[3pt]
+I87 & \texttt{(7,4,L1)*}\\\addlinespace[3pt]
+I88 & \texttt{(43,2,L12)*}\\\addlinespace[3pt]
+I89 & \texttt{(50,2,L12)}\\\addlinespace[3pt]
+I90 & \texttt{(41,2,L12)*}\\\addlinespace[3pt]
+I91 & \texttt{(42,2,L12)*}\\\addlinespace[3pt]
+I92 & \texttt{(34,2,L11)}; \texttt{(37,0,L12)}; \texttt{(38,0,L12)}; \texttt{(39,0,L12)}; \texttt{(40,0,L12)}; \texttt{(41,0,L12)}; \texttt{(42,0,L12)}; \texttt{(43,0,L12)}; \texttt{(44,0,L12)}; \texttt{(45,0,L12)}; \texttt{(46,0,L12)}; \texttt{(47,0,L12)}; \texttt{(48,0,L12)}; \texttt{(49,0,L12)}; \texttt{(50,0,L12)}\\\addlinespace[3pt]
+I93 & \texttt{(35,2,L11)}; \texttt{(37,0,L12)}; \texttt{(38,0,L12)}; \texttt{(39,0,L12)}; \texttt{(40,0,L12)}; \texttt{(41,0,L12)}; \texttt{(42,0,L12)}; \texttt{(43,0,L12)}; \texttt{(44,0,L12)}; \texttt{(45,0,L12)}; \texttt{(46,0,L12)}; \texttt{(47,0,L12)}; \texttt{(48,0,L12)}; \texttt{(49,0,L12)}; \texttt{(50,0,L12)}\\\addlinespace[3pt]
+I94 & \texttt{(27,2,L9)}; \texttt{(29,0,L10)}; \texttt{(30,0,L10)}; \texttt{(31,0,L10)}; \texttt{(32,0,L10)}; \texttt{(33,0,L10)}; \texttt{(34,0,L11)}; \texttt{(35,0,L11)}; \texttt{(36,0,L11)}; \texttt{(37,0,L12)}; \texttt{(38,0,L12)}; \texttt{(39,0,L12)}; \texttt{(40,0,L12)}; \texttt{(41,0,L12)}; \texttt{(42,0,L12)}; \texttt{(43,0,L12)}; \texttt{(44,0,L12)}; \texttt{(45,0,L12)}; \texttt{(46,0,L12)}; \texttt{(47,0,L12)}; \texttt{(48,0,L12)}; \texttt{(49,0,L12)}; \texttt{(50,0,L12)}\\\addlinespace[3pt]
+I95 & \texttt{(26,2,L9)}; \texttt{(29,0,L10)}; \texttt{(30,0,L10)}; \texttt{(31,0,L10)}; \texttt{(32,0,L10)}; \texttt{(33,0,L10)}; \texttt{(34,0,L11)}; \texttt{(35,0,L11)}; \texttt{(36,0,L11)}; \texttt{(37,0,L12)}; \texttt{(38,0,L12)}; \texttt{(39,0,L12)}; \texttt{(40,0,L12)}; \texttt{(41,0,L12)}; \texttt{(42,0,L12)}; \texttt{(43,0,L12)}; \texttt{(44,0,L12)}; \texttt{(45,0,L12)}; \texttt{(46,0,L12)}; \texttt{(47,0,L12)}; \texttt{(48,0,L12)}; \texttt{(49,0,L12)}; \texttt{(50,0,L12)}\\\addlinespace[3pt]
+I96 & \texttt{(2,0,L13)}; \texttt{(13,0,L1)}; \texttt{(14,0,L1)}; \texttt{(15,0,L13)}; \texttt{(16,0,L13)}; \texttt{(17,0,L13)}; \texttt{(17,4,L1)}; \texttt{(18,0,L13)}; \texttt{(19,0,L1)}; \texttt{(19,4,L1)}; \texttt{(20,0,L1)}; \texttt{(20,4,L1)}; \texttt{(21,0,L1)}; \texttt{(22,0,L13)}; \texttt{(23,0,L13)}; \texttt{(24,0,L13)}\\\addlinespace[3pt]
+I97 & \texttt{(39,2,L12)}; \texttt{(41,0,L12)}; \texttt{(42,0,L12)}; \texttt{(43,0,L12)}; \texttt{(44,0,L12)}; \texttt{(45,0,L12)}; \texttt{(46,0,L12)}; \texttt{(47,0,L12)}; \texttt{(48,0,L12)}; \texttt{(49,0,L12)}; \texttt{(50,0,L12)}\\\addlinespace[3pt]
+I98 & \texttt{(37,2,L12)}; \texttt{(41,0,L12)}; \texttt{(42,0,L12)}; \texttt{(43,0,L12)}; \texttt{(44,0,L12)}; \texttt{(45,0,L12)}; \texttt{(46,0,L12)}; \texttt{(47,0,L12)}; \texttt{(48,0,L12)}; \texttt{(49,0,L12)}; \texttt{(50,0,L12)}\\\addlinespace[3pt]
+I99 & \texttt{(38,2,L12)}; \texttt{(41,0,L12)}; \texttt{(42,0,L12)}; \texttt{(43,0,L12)}; \texttt{(44,0,L12)}; \texttt{(45,0,L12)}; \texttt{(46,0,L12)}; \texttt{(47,0,L12)}; \texttt{(48,0,L12)}; \texttt{(49,0,L12)}; \texttt{(50,0,L12)}\\\addlinespace[3pt]
+I100 & \texttt{(29,2,L10)}; \texttt{(34,0,L11)}; \texttt{(35,0,L11)}; \texttt{(36,0,L11)}; \texttt{(37,0,L12)}; \texttt{(38,0,L12)}; \texttt{(39,0,L12)}; \texttt{(40,0,L12)}; \texttt{(41,0,L12)}; \texttt{(42,0,L12)}; \texttt{(43,0,L12)}; \texttt{(44,0,L12)}; \texttt{(45,0,L12)}; \texttt{(46,0,L12)}; \texttt{(47,0,L12)}; \texttt{(48,0,L12)}; \texttt{(49,0,L12)}; \texttt{(50,0,L12)}\\\addlinespace[3pt]
+I101 & \texttt{(30,2,L10)}; \texttt{(34,0,L11)}; \texttt{(35,0,L11)}; \texttt{(36,0,L11)}; \texttt{(37,0,L12)}; \texttt{(38,0,L12)}; \texttt{(39,0,L12)}; \texttt{(40,0,L12)}; \texttt{(41,0,L12)}; \texttt{(42,0,L12)}; \texttt{(43,0,L12)}; \texttt{(44,0,L12)}; \texttt{(45,0,L12)}; \texttt{(46,0,L12)}; \texttt{(47,0,L12)}; \texttt{(48,0,L12)}; \texttt{(49,0,L12)}; \texttt{(50,0,L12)}\\\addlinespace[3pt]
+I102 & \texttt{(31,2,L10)}; \texttt{(34,0,L11)}; \texttt{(35,0,L11)}; \texttt{(36,0,L11)}; \texttt{(37,0,L12)}; \texttt{(38,0,L12)}; \texttt{(39,0,L12)}; \texttt{(40,0,L12)}; \texttt{(41,0,L12)}; \texttt{(42,0,L12)}; \texttt{(43,0,L12)}; \texttt{(44,0,L12)}; \texttt{(45,0,L12)}; \texttt{(46,0,L12)}; \texttt{(47,0,L12)}; \texttt{(48,0,L12)}; \texttt{(49,0,L12)}; \texttt{(50,0,L12)}\\\addlinespace[3pt]
+I103 & \texttt{(32,2,L10)}; \texttt{(34,0,L11)}; \texttt{(35,0,L11)}; \texttt{(36,0,L11)}; \texttt{(37,0,L12)}; \texttt{(38,0,L12)}; \texttt{(39,0,L12)}; \texttt{(40,0,L12)}; \texttt{(41,0,L12)}; \texttt{(42,0,L12)}; \texttt{(43,0,L12)}; \texttt{(44,0,L12)}; \texttt{(45,0,L12)}; \texttt{(46,0,L12)}; \texttt{(47,0,L12)}; \texttt{(48,0,L12)}; \texttt{(49,0,L12)}; \texttt{(50,0,L12)}\\\addlinespace[3pt]
+I104 & \texttt{(50,3,L7)*}\\\addlinespace[3pt]
+I105 & \texttt{(34,3,L6)*}; \texttt{(37,1,L7)}; \texttt{(38,1,L7)}; \texttt{(39,1,L7)}\\\addlinespace[3pt]
+I106 & \texttt{(35,3,L6)*}; \texttt{(37,1,L7)}; \texttt{(38,1,L7)}; \texttt{(39,1,L7)}\\\addlinespace[3pt]
+I107 & \texttt{(27,3,L4)*}; \texttt{(29,1,L5)}; \texttt{(30,1,L5)}; \texttt{(31,1,L5)}; \texttt{(32,1,L5)}\\\addlinespace[3pt]
+I108 & \texttt{(26,3,L4)*}; \texttt{(29,1,L5)}; \texttt{(30,1,L5)}; \texttt{(31,1,L5)}; \texttt{(32,1,L5)}\\\addlinespace[3pt]
+I109 & \texttt{(39,3,L7)*}\\\addlinespace[3pt]
+I110 & \texttt{(37,3,L7)*}\\\addlinespace[3pt]
+I111 & \texttt{(38,3,L7)*}\\\addlinespace[3pt]
+I112 & \texttt{(29,3,L5)*}; \texttt{(34,1,L6)}; \texttt{(35,1,L6)}\\\addlinespace[3pt]
+I113 & \texttt{(30,3,L5)*}; \texttt{(34,1,L6)}; \texttt{(35,1,L6)}\\\addlinespace[3pt]
+I114 & \texttt{(31,3,L5)*}; \texttt{(34,1,L6)}; \texttt{(35,1,L6)}\\\addlinespace[3pt]
+I115 & \texttt{(32,3,L5)*}; \texttt{(34,1,L6)}; \texttt{(35,1,L6)}\\\addlinespace[3pt]
+I116 & \texttt{(2,0,L1)}; \texttt{(15,0,L1)}; \texttt{(16,0,L1)}; \texttt{(17,0,L1)}; \texttt{(18,0,L1)}; \texttt{(18,4,L1)}; \texttt{(19,0,L1)}; \texttt{(20,0,L1)}; \texttt{(21,0,L1)}; \texttt{(21,4,L1)}; \texttt{(22,0,L1)}; \texttt{(23,0,L1)}; \texttt{(24,0,L1)}\\\addlinespace[3pt]
+I117 & \texttt{(50,3,L12)*}\\\addlinespace[3pt]
+I118 & \texttt{(34,3,L11)*}; \texttt{(37,1,L12)}; \texttt{(38,1,L12)}; \texttt{(39,1,L12)}\\\addlinespace[3pt]
+I119 & \texttt{(35,3,L11)*}; \texttt{(37,1,L12)}; \texttt{(38,1,L12)}; \texttt{(39,1,L12)}\\\addlinespace[3pt]
+I120 & \texttt{(27,3,L9)*}; \texttt{(29,1,L10)}; \texttt{(30,1,L10)}; \texttt{(31,1,L10)}; \texttt{(32,1,L10)}\\\addlinespace[3pt]
+I121 & \texttt{(26,3,L9)*}; \texttt{(29,1,L10)}; \texttt{(30,1,L10)}; \texttt{(31,1,L10)}; \texttt{(32,1,L10)}\\\addlinespace[3pt]
+I122 & \texttt{(24,1,L13)*}\\\addlinespace[3pt]
+I123 & \texttt{(16,1,L13)*}\\\addlinespace[3pt]
+I124 & \texttt{(22,1,L13)}\\\addlinespace[3pt]
+I125 & \texttt{(13,1,L1)*}; \texttt{(17,5,L1)}; \texttt{(20,5,L1)}\\\addlinespace[3pt]
+I126 & \texttt{(15,1,L13)*}\\\addlinespace[3pt]
+I127 & \texttt{(19,5,L1)*}\\\addlinespace[3pt]
+I128 & \texttt{(17,1,L13)}; \texttt{(19,1,L1)}; \texttt{(20,1,L1)}\\\addlinespace[3pt]
+I129 & \texttt{(23,1,L13)}; \texttt{(25,0,L3)}; \texttt{(26,0,L4)}; \texttt{(27,0,L4)}; \texttt{(28,0,L4)}; \texttt{(29,0,L5)}; \texttt{(30,0,L5)}; \texttt{(31,0,L5)}; \texttt{(32,0,L5)}; \texttt{(33,0,L5)}; \texttt{(34,0,L6)}; \texttt{(35,0,L6)}; \texttt{(36,0,L6)}; \texttt{(37,0,L7)}; \texttt{(38,0,L7)}; \texttt{(39,0,L7)}; \texttt{(40,0,L7)}; \texttt{(41,0,L7)}; \texttt{(42,0,L7)}; \texttt{(43,0,L7)}; \texttt{(44,0,L7)}; \texttt{(45,0,L7)}; \texttt{(46,0,L7)}; \texttt{(47,0,L7)}; \texttt{(48,0,L7)}; \texttt{(49,0,L7)}; \texttt{(50,0,L7)}\\\addlinespace[3pt]
+I130 & \texttt{(18,1,L13)}; \texttt{(21,1,L1)}\\\addlinespace[3pt]
+I131 & \texttt{(2,1,L13)}; \texttt{(3,0,L1)}; \texttt{(4,0,L1)*}\\\addlinespace[3pt]
+I132 & \texttt{(39,3,L12)*}\\\addlinespace[3pt]
+I133 & \texttt{(37,3,L12)*}\\\addlinespace[3pt]
+I134 & \texttt{(38,3,L12)*}\\\addlinespace[3pt]
+I135 & \texttt{(29,3,L10)*}; \texttt{(34,1,L11)}; \texttt{(35,1,L11)}\\\addlinespace[3pt]
+I136 & \texttt{(30,3,L10)*}; \texttt{(34,1,L11)}; \texttt{(35,1,L11)}\\\addlinespace[3pt]
+I137 & \texttt{(31,3,L10)*}; \texttt{(34,1,L11)}; \texttt{(35,1,L11)}\\\addlinespace[3pt]
+I138 & \texttt{(32,3,L10)*}; \texttt{(34,1,L11)}; \texttt{(35,1,L11)}\\\addlinespace[3pt]
+I139 & \texttt{(18,5,L1)*}\\\addlinespace[3pt]
+I140 & \texttt{(21,5,L1)*}\\\addlinespace[3pt]
+I141 & \texttt{(22,2,L13)}; \texttt{(25,0,L3)}; \texttt{(26,0,L4)}; \texttt{(27,0,L4)}; \texttt{(28,0,L4)}; \texttt{(29,0,L5)}; \texttt{(30,0,L5)}; \texttt{(31,0,L5)}; \texttt{(32,0,L5)}; \texttt{(33,0,L5)}; \texttt{(34,0,L6)}; \texttt{(35,0,L6)}; \texttt{(36,0,L6)}; \texttt{(37,0,L7)}; \texttt{(38,0,L7)}; \texttt{(39,0,L7)}; \texttt{(40,0,L7)}; \texttt{(41,0,L7)}; \texttt{(42,0,L7)}; \texttt{(43,0,L7)}; \texttt{(44,0,L7)}; \texttt{(45,0,L7)}; \texttt{(46,0,L7)}; \texttt{(47,0,L7)}; \texttt{(48,0,L7)}; \texttt{(49,0,L7)}; \texttt{(50,0,L7)}\\\addlinespace[3pt]
+I142 & \texttt{(2,0,L1)}; \texttt{(15,0,L1)}; \texttt{(16,0,L1)}; \texttt{(17,0,L1)}; \texttt{(17,6,L1)}; \texttt{(18,0,L1)}; \texttt{(19,0,L1)}; \texttt{(20,0,L1)}; \texttt{(20,6,L1)}; \texttt{(21,0,L1)}; \texttt{(22,0,L1)}; \texttt{(23,0,L1)}; \texttt{(24,0,L1)}\\\addlinespace[3pt]
+I143 & \texttt{(17,2,L13)}; \texttt{(19,2,L1)}; \texttt{(20,2,L1)}; \texttt{(25,0,L8)}; \texttt{(26,0,L9)}; \texttt{(27,0,L9)}; \texttt{(28,0,L9)}; \texttt{(29,0,L10)}; \texttt{(30,0,L10)}; \texttt{(31,0,L10)}; \texttt{(32,0,L10)}; \texttt{(33,0,L10)}; \texttt{(34,0,L11)}; \texttt{(35,0,L11)}; \texttt{(36,0,L11)}; \texttt{(37,0,L12)}; \texttt{(38,0,L12)}; \texttt{(39,0,L12)}; \texttt{(40,0,L12)}; \texttt{(41,0,L12)}; \texttt{(42,0,L12)}; \texttt{(43,0,L12)}; \texttt{(44,0,L12)}; \texttt{(45,0,L12)}; \texttt{(46,0,L12)}; \texttt{(47,0,L12)}; \texttt{(48,0,L12)}; \texttt{(49,0,L12)}; \texttt{(50,0,L12)}\\\addlinespace[3pt]
+I144 & \texttt{(23,2,L13)}\\\addlinespace[3pt]
+I145 & \texttt{(18,2,L13)}; \texttt{(21,2,L1)}; \texttt{(25,0,L8)}; \texttt{(26,0,L9)}; \texttt{(27,0,L9)}; \texttt{(28,0,L9)}; \texttt{(29,0,L10)}; \texttt{(30,0,L10)}; \texttt{(31,0,L10)}; \texttt{(32,0,L10)}; \texttt{(33,0,L10)}; \texttt{(34,0,L11)}; \texttt{(35,0,L11)}; \texttt{(36,0,L11)}; \texttt{(37,0,L12)}; \texttt{(38,0,L12)}; \texttt{(39,0,L12)}; \texttt{(40,0,L12)}; \texttt{(41,0,L12)}; \texttt{(42,0,L12)}; \texttt{(43,0,L12)}; \texttt{(44,0,L12)}; \texttt{(45,0,L12)}; \texttt{(46,0,L12)}; \texttt{(47,0,L12)}; \texttt{(48,0,L12)}; \texttt{(49,0,L12)}; \texttt{(50,0,L12)}\\\addlinespace[3pt]
+I146 & \texttt{(2,0,L1)}; \texttt{(2,2,L13)}; \texttt{(3,1,L1)}; \texttt{(5,0,L1)}; \texttt{(6,0,L1)}; \texttt{(7,0,L1)}; \texttt{(8,0,L2)}; \texttt{(9,0,L2)}; \texttt{(10,0,L2)}; \texttt{(13,0,L1)}; \texttt{(14,0,L1)}; \texttt{(15,0,L1)}; \texttt{(16,0,L1)}; \texttt{(17,0,L1)}; \texttt{(18,0,L1)}; \texttt{(19,0,L1)}; \texttt{(20,0,L1)}; \texttt{(21,0,L1)}; \texttt{(22,0,L1)}; \texttt{(23,0,L1)}; \texttt{(24,0,L1)}\\\addlinespace[3pt]
+I147 & \texttt{(22,3,L13)}\\\addlinespace[3pt]
+I148 & \texttt{(17,7,L1)*}\\\addlinespace[3pt]
+I149 & \texttt{(20,7,L1)*}\\\addlinespace[3pt]
+I150 & \texttt{(17,3,L13)}; \texttt{(19,3,L1)}; \texttt{(20,3,L1)}\\\addlinespace[3pt]
+I151 & \texttt{(23,3,L13)*}\\\addlinespace[3pt]
+I152 & \texttt{(18,3,L13)}; \texttt{(21,3,L1)}\\\addlinespace[3pt]
+I153 & \texttt{(2,3,L13)*}\\\addlinespace[3pt]
+I154 & \texttt{(22,4,L13)*}\\\addlinespace[3pt]
+I155 & \texttt{(2,0,L13)}; \texttt{(13,0,L1)}; \texttt{(14,0,L1)}; \texttt{(15,0,L13)}; \texttt{(16,0,L13)}; \texttt{(17,0,L13)}; \texttt{(17,4,L13)}; \texttt{(18,0,L13)}; \texttt{(19,0,L1)}; \texttt{(19,4,L1)}; \texttt{(20,0,L1)}; \texttt{(20,4,L1)}; \texttt{(21,0,L1)}; \texttt{(22,0,L13)}; \texttt{(23,0,L13)}; \texttt{(24,0,L13)}\\\addlinespace[3pt]
+I156 & \texttt{(2,0,L13)}; \texttt{(15,0,L13)}; \texttt{(16,0,L13)}; \texttt{(17,0,L13)}; \texttt{(18,0,L13)}; \texttt{(18,4,L13)}; \texttt{(19,0,L1)}; \texttt{(20,0,L1)}; \texttt{(21,0,L1)}; \texttt{(21,4,L1)}; \texttt{(22,0,L13)}; \texttt{(23,0,L13)}; \texttt{(24,0,L13)}\\\addlinespace[3pt]
+I157 & \texttt{(13,1,L1)*}; \texttt{(17,5,L13)}; \texttt{(20,5,L1)}\\\addlinespace[3pt]
+I158 & \texttt{(18,5,L13)*}\\\addlinespace[3pt]
+I159 & \texttt{(2,0,L13)}; \texttt{(15,0,L13)}; \texttt{(16,0,L13)}; \texttt{(17,0,L13)}; \texttt{(17,6,L13)}; \texttt{(18,0,L13)}; \texttt{(19,0,L1)}; \texttt{(20,0,L1)}; \texttt{(20,6,L1)}; \texttt{(21,0,L1)}; \texttt{(22,0,L13)}; \texttt{(23,0,L13)}; \texttt{(24,0,L13)}\\\addlinespace[3pt]
+I160 & \texttt{(17,7,L13)*}\\\addlinespace[3pt]
+\bottomrule\end{longtable}}
+\section*{Todas las transiciones GOTO}
+{\small\begin{longtable}{@{}r p{14.7cm}@{}}\toprule Origen & Símbolo : destino\\\midrule\endhead
+I0 & \texttt{Program}: I1; \texttt{int}: I2\\\addlinespace[3pt]
+I1 & Sin transiciones.\\\addlinespace[3pt]
+I2 & \texttt{main}: I3\\\addlinespace[3pt]
+I3 & \texttt{(}: I4\\\addlinespace[3pt]
+I4 & \texttt{)}: I5\\\addlinespace[3pt]
+I5 & \texttt{Block}: I6; \texttt{\{}: I7\\\addlinespace[3pt]
+I6 & Sin transiciones.\\\addlinespace[3pt]
+I7 & \texttt{Items}: I8\\\addlinespace[3pt]
+I8 & \texttt{;}: I9; \texttt{Block}: I10; \texttt{Decl}: I11; \texttt{ID}: I12; \texttt{Item}: I13; \texttt{Matched}: I14; \texttt{Simple}: I15; \texttt{Stmt}: I16; \texttt{Type}: I17; \texttt{Unmatched}: I18; \texttt{char}: I19; \texttt{float}: I20; \texttt{if}: I21; \texttt{int}: I22; \texttt{return}: I23; \texttt{while}: I24; \texttt{\{}: I25; \texttt{\}}: I26\\\addlinespace[3pt]
+I9 & Sin transiciones.\\\addlinespace[3pt]
+I10 & Sin transiciones.\\\addlinespace[3pt]
+I11 & Sin transiciones.\\\addlinespace[3pt]
+I12 & \texttt{=}: I27\\\addlinespace[3pt]
+I13 & Sin transiciones.\\\addlinespace[3pt]
+I14 & Sin transiciones.\\\addlinespace[3pt]
+I15 & Sin transiciones.\\\addlinespace[3pt]
+I16 & Sin transiciones.\\\addlinespace[3pt]
+I17 & \texttt{ID}: I28\\\addlinespace[3pt]
+I18 & Sin transiciones.\\\addlinespace[3pt]
+I19 & Sin transiciones.\\\addlinespace[3pt]
+I20 & Sin transiciones.\\\addlinespace[3pt]
+I21 & \texttt{(}: I29\\\addlinespace[3pt]
+I22 & Sin transiciones.\\\addlinespace[3pt]
+I23 & \texttt{!}: I30; \texttt{(}: I31; \texttt{+}: I32; \texttt{-}: I33; \texttt{Add}: I34; \texttt{CHAR}: I35; \texttt{Equality}: I36; \texttt{Expr}: I37; \texttt{FLOAT}: I38; \texttt{ID}: I39; \texttt{INT}: I40; \texttt{Mul}: I41; \texttt{Primary}: I42; \texttt{Relation}: I43; \texttt{STRING}: I44; \texttt{Unary}: I45\\\addlinespace[3pt]
+I24 & \texttt{(}: I46\\\addlinespace[3pt]
+I25 & \texttt{Items}: I47\\\addlinespace[3pt]
+I26 & Sin transiciones.\\\addlinespace[3pt]
+I27 & \texttt{!}: I30; \texttt{(}: I31; \texttt{+}: I32; \texttt{-}: I33; \texttt{Add}: I34; \texttt{CHAR}: I35; \texttt{Equality}: I36; \texttt{Expr}: I48; \texttt{FLOAT}: I38; \texttt{ID}: I39; \texttt{INT}: I40; \texttt{Mul}: I41; \texttt{Primary}: I42; \texttt{Relation}: I43; \texttt{STRING}: I44; \texttt{Unary}: I45\\\addlinespace[3pt]
+I28 & \texttt{=}: I49; \texttt{Init}: I50\\\addlinespace[3pt]
+I29 & \texttt{!}: I51; \texttt{(}: I52; \texttt{+}: I53; \texttt{-}: I54; \texttt{Add}: I55; \texttt{CHAR}: I56; \texttt{Equality}: I57; \texttt{Expr}: I58; \texttt{FLOAT}: I59; \texttt{ID}: I60; \texttt{INT}: I61; \texttt{Mul}: I62; \texttt{Primary}: I63; \texttt{Relation}: I64; \texttt{STRING}: I65; \texttt{Unary}: I66\\\addlinespace[3pt]
+I30 & \texttt{!}: I30; \texttt{(}: I31; \texttt{+}: I32; \texttt{-}: I33; \texttt{CHAR}: I35; \texttt{FLOAT}: I38; \texttt{ID}: I39; \texttt{INT}: I40; \texttt{Primary}: I42; \texttt{STRING}: I44; \texttt{Unary}: I67\\\addlinespace[3pt]
+I31 & \texttt{!}: I51; \texttt{(}: I52; \texttt{+}: I53; \texttt{-}: I54; \texttt{Add}: I55; \texttt{CHAR}: I56; \texttt{Equality}: I57; \texttt{Expr}: I68; \texttt{FLOAT}: I59; \texttt{ID}: I60; \texttt{INT}: I61; \texttt{Mul}: I62; \texttt{Primary}: I63; \texttt{Relation}: I64; \texttt{STRING}: I65; \texttt{Unary}: I66\\\addlinespace[3pt]
+I32 & \texttt{!}: I30; \texttt{(}: I31; \texttt{+}: I32; \texttt{-}: I33; \texttt{CHAR}: I35; \texttt{FLOAT}: I38; \texttt{ID}: I39; \texttt{INT}: I40; \texttt{Primary}: I42; \texttt{STRING}: I44; \texttt{Unary}: I69\\\addlinespace[3pt]
+I33 & \texttt{!}: I30; \texttt{(}: I31; \texttt{+}: I32; \texttt{-}: I33; \texttt{CHAR}: I35; \texttt{FLOAT}: I38; \texttt{ID}: I39; \texttt{INT}: I40; \texttt{Primary}: I42; \texttt{STRING}: I44; \texttt{Unary}: I70\\\addlinespace[3pt]
+I34 & \texttt{+}: I71; \texttt{-}: I72\\\addlinespace[3pt]
+I35 & Sin transiciones.\\\addlinespace[3pt]
+I36 & \texttt{!=}: I73; \texttt{==}: I74\\\addlinespace[3pt]
+I37 & \texttt{;}: I75\\\addlinespace[3pt]
+I38 & Sin transiciones.\\\addlinespace[3pt]
+I39 & Sin transiciones.\\\addlinespace[3pt]
+I40 & Sin transiciones.\\\addlinespace[3pt]
+I41 & \texttt{\%}: I76; \texttt{*}: I77; \texttt{/}: I78\\\addlinespace[3pt]
+I42 & Sin transiciones.\\\addlinespace[3pt]
+I43 & \texttt{\textless{}}: I79; \texttt{\textless{}=}: I80; \texttt{\textgreater{}}: I81; \texttt{\textgreater{}=}: I82\\\addlinespace[3pt]
+I44 & Sin transiciones.\\\addlinespace[3pt]
+I45 & Sin transiciones.\\\addlinespace[3pt]
+I46 & \texttt{!}: I51; \texttt{(}: I52; \texttt{+}: I53; \texttt{-}: I54; \texttt{Add}: I55; \texttt{CHAR}: I56; \texttt{Equality}: I57; \texttt{Expr}: I83; \texttt{FLOAT}: I59; \texttt{ID}: I60; \texttt{INT}: I61; \texttt{Mul}: I62; \texttt{Primary}: I63; \texttt{Relation}: I64; \texttt{STRING}: I65; \texttt{Unary}: I66\\\addlinespace[3pt]
+I47 & \texttt{;}: I9; \texttt{Block}: I10; \texttt{Decl}: I11; \texttt{ID}: I12; \texttt{Item}: I13; \texttt{Matched}: I14; \texttt{Simple}: I15; \texttt{Stmt}: I16; \texttt{Type}: I17; \texttt{Unmatched}: I18; \texttt{char}: I19; \texttt{float}: I20; \texttt{if}: I21; \texttt{int}: I22; \texttt{return}: I23; \texttt{while}: I24; \texttt{\{}: I25; \texttt{\}}: I84\\\addlinespace[3pt]
+I48 & \texttt{;}: I85\\\addlinespace[3pt]
+I49 & \texttt{!}: I30; \texttt{(}: I31; \texttt{+}: I32; \texttt{-}: I33; \texttt{Add}: I34; \texttt{CHAR}: I35; \texttt{Equality}: I36; \texttt{Expr}: I86; \texttt{FLOAT}: I38; \texttt{ID}: I39; \texttt{INT}: I40; \texttt{Mul}: I41; \texttt{Primary}: I42; \texttt{Relation}: I43; \texttt{STRING}: I44; \texttt{Unary}: I45\\\addlinespace[3pt]
+I50 & \texttt{;}: I87\\\addlinespace[3pt]
+I51 & \texttt{!}: I51; \texttt{(}: I52; \texttt{+}: I53; \texttt{-}: I54; \texttt{CHAR}: I56; \texttt{FLOAT}: I59; \texttt{ID}: I60; \texttt{INT}: I61; \texttt{Primary}: I63; \texttt{STRING}: I65; \texttt{Unary}: I88\\\addlinespace[3pt]
+I52 & \texttt{!}: I51; \texttt{(}: I52; \texttt{+}: I53; \texttt{-}: I54; \texttt{Add}: I55; \texttt{CHAR}: I56; \texttt{Equality}: I57; \texttt{Expr}: I89; \texttt{FLOAT}: I59; \texttt{ID}: I60; \texttt{INT}: I61; \texttt{Mul}: I62; \texttt{Primary}: I63; \texttt{Relation}: I64; \texttt{STRING}: I65; \texttt{Unary}: I66\\\addlinespace[3pt]
+I53 & \texttt{!}: I51; \texttt{(}: I52; \texttt{+}: I53; \texttt{-}: I54; \texttt{CHAR}: I56; \texttt{FLOAT}: I59; \texttt{ID}: I60; \texttt{INT}: I61; \texttt{Primary}: I63; \texttt{STRING}: I65; \texttt{Unary}: I90\\\addlinespace[3pt]
+I54 & \texttt{!}: I51; \texttt{(}: I52; \texttt{+}: I53; \texttt{-}: I54; \texttt{CHAR}: I56; \texttt{FLOAT}: I59; \texttt{ID}: I60; \texttt{INT}: I61; \texttt{Primary}: I63; \texttt{STRING}: I65; \texttt{Unary}: I91\\\addlinespace[3pt]
+I55 & \texttt{+}: I92; \texttt{-}: I93\\\addlinespace[3pt]
+I56 & Sin transiciones.\\\addlinespace[3pt]
+I57 & \texttt{!=}: I94; \texttt{==}: I95\\\addlinespace[3pt]
+I58 & \texttt{)}: I96\\\addlinespace[3pt]
+I59 & Sin transiciones.\\\addlinespace[3pt]
+I60 & Sin transiciones.\\\addlinespace[3pt]
+I61 & Sin transiciones.\\\addlinespace[3pt]
+I62 & \texttt{\%}: I97; \texttt{*}: I98; \texttt{/}: I99\\\addlinespace[3pt]
+I63 & Sin transiciones.\\\addlinespace[3pt]
+I64 & \texttt{\textless{}}: I100; \texttt{\textless{}=}: I101; \texttt{\textgreater{}}: I102; \texttt{\textgreater{}=}: I103\\\addlinespace[3pt]
+I65 & Sin transiciones.\\\addlinespace[3pt]
+I66 & Sin transiciones.\\\addlinespace[3pt]
+I67 & Sin transiciones.\\\addlinespace[3pt]
+I68 & \texttt{)}: I104\\\addlinespace[3pt]
+I69 & Sin transiciones.\\\addlinespace[3pt]
+I70 & Sin transiciones.\\\addlinespace[3pt]
+I71 & \texttt{!}: I30; \texttt{(}: I31; \texttt{+}: I32; \texttt{-}: I33; \texttt{CHAR}: I35; \texttt{FLOAT}: I38; \texttt{ID}: I39; \texttt{INT}: I40; \texttt{Mul}: I105; \texttt{Primary}: I42; \texttt{STRING}: I44; \texttt{Unary}: I45\\\addlinespace[3pt]
+I72 & \texttt{!}: I30; \texttt{(}: I31; \texttt{+}: I32; \texttt{-}: I33; \texttt{CHAR}: I35; \texttt{FLOAT}: I38; \texttt{ID}: I39; \texttt{INT}: I40; \texttt{Mul}: I106; \texttt{Primary}: I42; \texttt{STRING}: I44; \texttt{Unary}: I45\\\addlinespace[3pt]
+I73 & \texttt{!}: I30; \texttt{(}: I31; \texttt{+}: I32; \texttt{-}: I33; \texttt{Add}: I34; \texttt{CHAR}: I35; \texttt{FLOAT}: I38; \texttt{ID}: I39; \texttt{INT}: I40; \texttt{Mul}: I41; \texttt{Primary}: I42; \texttt{Relation}: I107; \texttt{STRING}: I44; \texttt{Unary}: I45\\\addlinespace[3pt]
+I74 & \texttt{!}: I30; \texttt{(}: I31; \texttt{+}: I32; \texttt{-}: I33; \texttt{Add}: I34; \texttt{CHAR}: I35; \texttt{FLOAT}: I38; \texttt{ID}: I39; \texttt{INT}: I40; \texttt{Mul}: I41; \texttt{Primary}: I42; \texttt{Relation}: I108; \texttt{STRING}: I44; \texttt{Unary}: I45\\\addlinespace[3pt]
+I75 & Sin transiciones.\\\addlinespace[3pt]
+I76 & \texttt{!}: I30; \texttt{(}: I31; \texttt{+}: I32; \texttt{-}: I33; \texttt{CHAR}: I35; \texttt{FLOAT}: I38; \texttt{ID}: I39; \texttt{INT}: I40; \texttt{Primary}: I42; \texttt{STRING}: I44; \texttt{Unary}: I109\\\addlinespace[3pt]
+I77 & \texttt{!}: I30; \texttt{(}: I31; \texttt{+}: I32; \texttt{-}: I33; \texttt{CHAR}: I35; \texttt{FLOAT}: I38; \texttt{ID}: I39; \texttt{INT}: I40; \texttt{Primary}: I42; \texttt{STRING}: I44; \texttt{Unary}: I110\\\addlinespace[3pt]
+I78 & \texttt{!}: I30; \texttt{(}: I31; \texttt{+}: I32; \texttt{-}: I33; \texttt{CHAR}: I35; \texttt{FLOAT}: I38; \texttt{ID}: I39; \texttt{INT}: I40; \texttt{Primary}: I42; \texttt{STRING}: I44; \texttt{Unary}: I111\\\addlinespace[3pt]
+I79 & \texttt{!}: I30; \texttt{(}: I31; \texttt{+}: I32; \texttt{-}: I33; \texttt{Add}: I112; \texttt{CHAR}: I35; \texttt{FLOAT}: I38; \texttt{ID}: I39; \texttt{INT}: I40; \texttt{Mul}: I41; \texttt{Primary}: I42; \texttt{STRING}: I44; \texttt{Unary}: I45\\\addlinespace[3pt]
+I80 & \texttt{!}: I30; \texttt{(}: I31; \texttt{+}: I32; \texttt{-}: I33; \texttt{Add}: I113; \texttt{CHAR}: I35; \texttt{FLOAT}: I38; \texttt{ID}: I39; \texttt{INT}: I40; \texttt{Mul}: I41; \texttt{Primary}: I42; \texttt{STRING}: I44; \texttt{Unary}: I45\\\addlinespace[3pt]
+I81 & \texttt{!}: I30; \texttt{(}: I31; \texttt{+}: I32; \texttt{-}: I33; \texttt{Add}: I114; \texttt{CHAR}: I35; \texttt{FLOAT}: I38; \texttt{ID}: I39; \texttt{INT}: I40; \texttt{Mul}: I41; \texttt{Primary}: I42; \texttt{STRING}: I44; \texttt{Unary}: I45\\\addlinespace[3pt]
+I82 & \texttt{!}: I30; \texttt{(}: I31; \texttt{+}: I32; \texttt{-}: I33; \texttt{Add}: I115; \texttt{CHAR}: I35; \texttt{FLOAT}: I38; \texttt{ID}: I39; \texttt{INT}: I40; \texttt{Mul}: I41; \texttt{Primary}: I42; \texttt{STRING}: I44; \texttt{Unary}: I45\\\addlinespace[3pt]
+I83 & \texttt{)}: I116\\\addlinespace[3pt]
+I84 & Sin transiciones.\\\addlinespace[3pt]
+I85 & Sin transiciones.\\\addlinespace[3pt]
+I86 & Sin transiciones.\\\addlinespace[3pt]
+I87 & Sin transiciones.\\\addlinespace[3pt]
+I88 & Sin transiciones.\\\addlinespace[3pt]
+I89 & \texttt{)}: I117\\\addlinespace[3pt]
+I90 & Sin transiciones.\\\addlinespace[3pt]
+I91 & Sin transiciones.\\\addlinespace[3pt]
+I92 & \texttt{!}: I51; \texttt{(}: I52; \texttt{+}: I53; \texttt{-}: I54; \texttt{CHAR}: I56; \texttt{FLOAT}: I59; \texttt{ID}: I60; \texttt{INT}: I61; \texttt{Mul}: I118; \texttt{Primary}: I63; \texttt{STRING}: I65; \texttt{Unary}: I66\\\addlinespace[3pt]
+I93 & \texttt{!}: I51; \texttt{(}: I52; \texttt{+}: I53; \texttt{-}: I54; \texttt{CHAR}: I56; \texttt{FLOAT}: I59; \texttt{ID}: I60; \texttt{INT}: I61; \texttt{Mul}: I119; \texttt{Primary}: I63; \texttt{STRING}: I65; \texttt{Unary}: I66\\\addlinespace[3pt]
+I94 & \texttt{!}: I51; \texttt{(}: I52; \texttt{+}: I53; \texttt{-}: I54; \texttt{Add}: I55; \texttt{CHAR}: I56; \texttt{FLOAT}: I59; \texttt{ID}: I60; \texttt{INT}: I61; \texttt{Mul}: I62; \texttt{Primary}: I63; \texttt{Relation}: I120; \texttt{STRING}: I65; \texttt{Unary}: I66\\\addlinespace[3pt]
+I95 & \texttt{!}: I51; \texttt{(}: I52; \texttt{+}: I53; \texttt{-}: I54; \texttt{Add}: I55; \texttt{CHAR}: I56; \texttt{FLOAT}: I59; \texttt{ID}: I60; \texttt{INT}: I61; \texttt{Mul}: I62; \texttt{Primary}: I63; \texttt{Relation}: I121; \texttt{STRING}: I65; \texttt{Unary}: I66\\\addlinespace[3pt]
+I96 & \texttt{;}: I122; \texttt{Block}: I123; \texttt{ID}: I124; \texttt{Matched}: I125; \texttt{Simple}: I126; \texttt{Stmt}: I127; \texttt{Unmatched}: I18; \texttt{if}: I128; \texttt{return}: I129; \texttt{while}: I130; \texttt{\{}: I131\\\addlinespace[3pt]
+I97 & \texttt{!}: I51; \texttt{(}: I52; \texttt{+}: I53; \texttt{-}: I54; \texttt{CHAR}: I56; \texttt{FLOAT}: I59; \texttt{ID}: I60; \texttt{INT}: I61; \texttt{Primary}: I63; \texttt{STRING}: I65; \texttt{Unary}: I132\\\addlinespace[3pt]
+I98 & \texttt{!}: I51; \texttt{(}: I52; \texttt{+}: I53; \texttt{-}: I54; \texttt{CHAR}: I56; \texttt{FLOAT}: I59; \texttt{ID}: I60; \texttt{INT}: I61; \texttt{Primary}: I63; \texttt{STRING}: I65; \texttt{Unary}: I133\\\addlinespace[3pt]
+I99 & \texttt{!}: I51; \texttt{(}: I52; \texttt{+}: I53; \texttt{-}: I54; \texttt{CHAR}: I56; \texttt{FLOAT}: I59; \texttt{ID}: I60; \texttt{INT}: I61; \texttt{Primary}: I63; \texttt{STRING}: I65; \texttt{Unary}: I134\\\addlinespace[3pt]
+I100 & \texttt{!}: I51; \texttt{(}: I52; \texttt{+}: I53; \texttt{-}: I54; \texttt{Add}: I135; \texttt{CHAR}: I56; \texttt{FLOAT}: I59; \texttt{ID}: I60; \texttt{INT}: I61; \texttt{Mul}: I62; \texttt{Primary}: I63; \texttt{STRING}: I65; \texttt{Unary}: I66\\\addlinespace[3pt]
+I101 & \texttt{!}: I51; \texttt{(}: I52; \texttt{+}: I53; \texttt{-}: I54; \texttt{Add}: I136; \texttt{CHAR}: I56; \texttt{FLOAT}: I59; \texttt{ID}: I60; \texttt{INT}: I61; \texttt{Mul}: I62; \texttt{Primary}: I63; \texttt{STRING}: I65; \texttt{Unary}: I66\\\addlinespace[3pt]
+I102 & \texttt{!}: I51; \texttt{(}: I52; \texttt{+}: I53; \texttt{-}: I54; \texttt{Add}: I137; \texttt{CHAR}: I56; \texttt{FLOAT}: I59; \texttt{ID}: I60; \texttt{INT}: I61; \texttt{Mul}: I62; \texttt{Primary}: I63; \texttt{STRING}: I65; \texttt{Unary}: I66\\\addlinespace[3pt]
+I103 & \texttt{!}: I51; \texttt{(}: I52; \texttt{+}: I53; \texttt{-}: I54; \texttt{Add}: I138; \texttt{CHAR}: I56; \texttt{FLOAT}: I59; \texttt{ID}: I60; \texttt{INT}: I61; \texttt{Mul}: I62; \texttt{Primary}: I63; \texttt{STRING}: I65; \texttt{Unary}: I66\\\addlinespace[3pt]
+I104 & Sin transiciones.\\\addlinespace[3pt]
+I105 & \texttt{\%}: I76; \texttt{*}: I77; \texttt{/}: I78\\\addlinespace[3pt]
+I106 & \texttt{\%}: I76; \texttt{*}: I77; \texttt{/}: I78\\\addlinespace[3pt]
+I107 & \texttt{\textless{}}: I79; \texttt{\textless{}=}: I80; \texttt{\textgreater{}}: I81; \texttt{\textgreater{}=}: I82\\\addlinespace[3pt]
+I108 & \texttt{\textless{}}: I79; \texttt{\textless{}=}: I80; \texttt{\textgreater{}}: I81; \texttt{\textgreater{}=}: I82\\\addlinespace[3pt]
+I109 & Sin transiciones.\\\addlinespace[3pt]
+I110 & Sin transiciones.\\\addlinespace[3pt]
+I111 & Sin transiciones.\\\addlinespace[3pt]
+I112 & \texttt{+}: I71; \texttt{-}: I72\\\addlinespace[3pt]
+I113 & \texttt{+}: I71; \texttt{-}: I72\\\addlinespace[3pt]
+I114 & \texttt{+}: I71; \texttt{-}: I72\\\addlinespace[3pt]
+I115 & \texttt{+}: I71; \texttt{-}: I72\\\addlinespace[3pt]
+I116 & \texttt{;}: I9; \texttt{Block}: I10; \texttt{ID}: I12; \texttt{Matched}: I139; \texttt{Simple}: I15; \texttt{Unmatched}: I140; \texttt{if}: I21; \texttt{return}: I23; \texttt{while}: I24; \texttt{\{}: I25\\\addlinespace[3pt]
+I117 & Sin transiciones.\\\addlinespace[3pt]
+I118 & \texttt{\%}: I97; \texttt{*}: I98; \texttt{/}: I99\\\addlinespace[3pt]
+I119 & \texttt{\%}: I97; \texttt{*}: I98; \texttt{/}: I99\\\addlinespace[3pt]
+I120 & \texttt{\textless{}}: I100; \texttt{\textless{}=}: I101; \texttt{\textgreater{}}: I102; \texttt{\textgreater{}=}: I103\\\addlinespace[3pt]
+I121 & \texttt{\textless{}}: I100; \texttt{\textless{}=}: I101; \texttt{\textgreater{}}: I102; \texttt{\textgreater{}=}: I103\\\addlinespace[3pt]
+I122 & Sin transiciones.\\\addlinespace[3pt]
+I123 & Sin transiciones.\\\addlinespace[3pt]
+I124 & \texttt{=}: I141\\\addlinespace[3pt]
+I125 & \texttt{else}: I142\\\addlinespace[3pt]
+I126 & Sin transiciones.\\\addlinespace[3pt]
+I127 & Sin transiciones.\\\addlinespace[3pt]
+I128 & \texttt{(}: I143\\\addlinespace[3pt]
+I129 & \texttt{!}: I30; \texttt{(}: I31; \texttt{+}: I32; \texttt{-}: I33; \texttt{Add}: I34; \texttt{CHAR}: I35; \texttt{Equality}: I36; \texttt{Expr}: I144; \texttt{FLOAT}: I38; \texttt{ID}: I39; \texttt{INT}: I40; \texttt{Mul}: I41; \texttt{Primary}: I42; \texttt{Relation}: I43; \texttt{STRING}: I44; \texttt{Unary}: I45\\\addlinespace[3pt]
+I130 & \texttt{(}: I145\\\addlinespace[3pt]
+I131 & \texttt{Items}: I146\\\addlinespace[3pt]
+I132 & Sin transiciones.\\\addlinespace[3pt]
+I133 & Sin transiciones.\\\addlinespace[3pt]
+I134 & Sin transiciones.\\\addlinespace[3pt]
+I135 & \texttt{+}: I92; \texttt{-}: I93\\\addlinespace[3pt]
+I136 & \texttt{+}: I92; \texttt{-}: I93\\\addlinespace[3pt]
+I137 & \texttt{+}: I92; \texttt{-}: I93\\\addlinespace[3pt]
+I138 & \texttt{+}: I92; \texttt{-}: I93\\\addlinespace[3pt]
+I139 & Sin transiciones.\\\addlinespace[3pt]
+I140 & Sin transiciones.\\\addlinespace[3pt]
+I141 & \texttt{!}: I30; \texttt{(}: I31; \texttt{+}: I32; \texttt{-}: I33; \texttt{Add}: I34; \texttt{CHAR}: I35; \texttt{Equality}: I36; \texttt{Expr}: I147; \texttt{FLOAT}: I38; \texttt{ID}: I39; \texttt{INT}: I40; \texttt{Mul}: I41; \texttt{Primary}: I42; \texttt{Relation}: I43; \texttt{STRING}: I44; \texttt{Unary}: I45\\\addlinespace[3pt]
+I142 & \texttt{;}: I9; \texttt{Block}: I10; \texttt{ID}: I12; \texttt{Matched}: I148; \texttt{Simple}: I15; \texttt{Unmatched}: I149; \texttt{if}: I21; \texttt{return}: I23; \texttt{while}: I24; \texttt{\{}: I25\\\addlinespace[3pt]
+I143 & \texttt{!}: I51; \texttt{(}: I52; \texttt{+}: I53; \texttt{-}: I54; \texttt{Add}: I55; \texttt{CHAR}: I56; \texttt{Equality}: I57; \texttt{Expr}: I150; \texttt{FLOAT}: I59; \texttt{ID}: I60; \texttt{INT}: I61; \texttt{Mul}: I62; \texttt{Primary}: I63; \texttt{Relation}: I64; \texttt{STRING}: I65; \texttt{Unary}: I66\\\addlinespace[3pt]
+I144 & \texttt{;}: I151\\\addlinespace[3pt]
+I145 & \texttt{!}: I51; \texttt{(}: I52; \texttt{+}: I53; \texttt{-}: I54; \texttt{Add}: I55; \texttt{CHAR}: I56; \texttt{Equality}: I57; \texttt{Expr}: I152; \texttt{FLOAT}: I59; \texttt{ID}: I60; \texttt{INT}: I61; \texttt{Mul}: I62; \texttt{Primary}: I63; \texttt{Relation}: I64; \texttt{STRING}: I65; \texttt{Unary}: I66\\\addlinespace[3pt]
+I146 & \texttt{;}: I9; \texttt{Block}: I10; \texttt{Decl}: I11; \texttt{ID}: I12; \texttt{Item}: I13; \texttt{Matched}: I14; \texttt{Simple}: I15; \texttt{Stmt}: I16; \texttt{Type}: I17; \texttt{Unmatched}: I18; \texttt{char}: I19; \texttt{float}: I20; \texttt{if}: I21; \texttt{int}: I22; \texttt{return}: I23; \texttt{while}: I24; \texttt{\{}: I25; \texttt{\}}: I153\\\addlinespace[3pt]
+I147 & \texttt{;}: I154\\\addlinespace[3pt]
+I148 & Sin transiciones.\\\addlinespace[3pt]
+I149 & Sin transiciones.\\\addlinespace[3pt]
+I150 & \texttt{)}: I155\\\addlinespace[3pt]
+I151 & Sin transiciones.\\\addlinespace[3pt]
+I152 & \texttt{)}: I156\\\addlinespace[3pt]
+I153 & Sin transiciones.\\\addlinespace[3pt]
+I154 & Sin transiciones.\\\addlinespace[3pt]
+I155 & \texttt{;}: I122; \texttt{Block}: I123; \texttt{ID}: I124; \texttt{Matched}: I157; \texttt{Simple}: I126; \texttt{Stmt}: I127; \texttt{Unmatched}: I18; \texttt{if}: I128; \texttt{return}: I129; \texttt{while}: I130; \texttt{\{}: I131\\\addlinespace[3pt]
+I156 & \texttt{;}: I122; \texttt{Block}: I123; \texttt{ID}: I124; \texttt{Matched}: I158; \texttt{Simple}: I126; \texttt{Unmatched}: I140; \texttt{if}: I128; \texttt{return}: I129; \texttt{while}: I130; \texttt{\{}: I131\\\addlinespace[3pt]
+I157 & \texttt{else}: I159\\\addlinespace[3pt]
+I158 & Sin transiciones.\\\addlinespace[3pt]
+I159 & \texttt{;}: I122; \texttt{Block}: I123; \texttt{ID}: I124; \texttt{Matched}: I160; \texttt{Simple}: I126; \texttt{Unmatched}: I149; \texttt{if}: I128; \texttt{return}: I129; \texttt{while}: I130; \texttt{\{}: I131\\\addlinespace[3pt]
+I160 & Sin transiciones.\\\addlinespace[3pt]
+\bottomrule\end{longtable}}\end{document}

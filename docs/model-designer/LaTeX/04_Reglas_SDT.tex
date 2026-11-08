@@ -1,0 +1,112 @@
+\input{estilo.tex}
+\begin{document}
+\titulo{4. Reglas SDT y tabla de símbolos}
+\section*{Alcance del análisis semántico}
+Las reglas SDT se asocian a las producciones de la gramática. Se evalúan sobre el árbol sintáctico después de que el parser acepta Program. Revisan declaraciones, uso de identificadores, ámbitos y compatibilidad de tipos; no ejecutan el programa.
+
+Cada nodo representa un símbolo gramatical y conserva su producción, sus hijos y su ubicación. Las hojas mantienen el lexema y la posición del token. Esto permite relacionar los errores semánticos con la parte del programa que los originó.
+
+Un error léxico impide continuar con el análisis sintáctico normal. Un error sintáctico impide evaluar SDT sobre un árbol completo. Si el parser acepta y SDT detecta un fallo, ambos resultados se distinguen.
+\section*{Atributos y tabla de símbolos}
+\begin{itemize}
+\item Expresiones: \texttt{data\_type}; \texttt{literal\_lexeme} solo para literales simples, sin calcular valores.
+\item Inicialización: \texttt{present} y tipo de la expresión. Bloques: \texttt{scope\_id}. Sentencias revisadas: \texttt{valid}.
+\item Símbolo: nombre, tipo, ID de ámbito, línea y columna de declaración, presencia de inicializador, tipo y lexema inicial cuando corresponde.
+\item Cada bloque define un ámbito. La búsqueda de identificadores va del interno al externo. Los duplicados se rechazan en el mismo ámbito; se permite sombreado en uno interior. Al terminar el bloque, su ámbito deja de estar activo.
+\item Insertar la variable antes de revisar su inicializador. Se comprueban nombres y tipos, sin análisis de inicialización definida. \texttt{int x=x;} no se rechaza por esa causa.
+\end{itemize}
+\section*{Política de tipos del subconjunto}
+\texttt{INT, FLOAT, CHAR, STRING} producen tipos \texttt{int, float, char, string}. Los únicos tipos declarables son \texttt{int, float, char}. Los literales deben llegar validados por el lexer; SDT no los vuelve a interpretar.
+
+Para inicialización, asignación y retorno se admite identidad o ampliación \texttt{char -> int -> float}. Se rechazan conversiones de estrechamiento. Esta es una política simplificada del proyecto; no reproduce todas las conversiones de ISO C.
+
+\begin{tabular}{@{}lccc@{}}\toprule Destino / origen & char & int & float\\\midrule
+char & Sí & No & No\\
+int & Sí & Sí & No\\
+float & Sí & Sí & Sí\\\bottomrule\end{tabular}
+
+Las cadenas no son asignables a ningún tipo declarable. En aritmética se promueve \texttt{char} a \texttt{int}; si hay \texttt{float}, el resultado es \texttt{float}. Las comparaciones y \texttt{!} producen \texttt{int}. El módulo \texttt{\%} solo admite enteros o caracteres y produce \texttt{int}. Las condiciones deben ser numéricas; \texttt{return} debe ser compatible con \texttt{int}.
+\section*{Acciones por producción}
+{\small\renewcommand{\arraystretch}{1.0}\begin{longtable}{p{1.4cm}p{4.5cm}p{9.6cm}}\toprule ID(s) & Producción o familia & Acción semántica\\\midrule\endhead
+0 & \texttt{Start -\textgreater{} Program} & El parser reconoce el ítem aumentado y emite ACCEPT. Program es la raíz del árbol; no corresponde una reducción ordinaria por 0.\\
+1 & \texttt{Program -\textgreater{} int main ( ) Block} & Fijar return\_type=int; visitar el bloque de main. Atributo valid=true solo si termina sin fallo.\\
+2 & \texttt{Block -\textgreater{} \{ Items \}} & Asignar un scope\_id nuevo; revisar Items en ese ámbito y cerrarlo al salir del bloque.\\
+3 & \texttt{Items -\textgreater{} Items Item} & Visitar de izquierda a derecha: primero la lista previa y después el nuevo elemento.\\
+4 & \texttt{Items -\textgreater{} epsilon} & No modificar los símbolos. La lista vacía es válida.\\
+5, 6 & \texttt{Item -\textgreater{} Decl | Stmt} & Visitar el único hijo y propagar su validez.\\
+7 & \texttt{Decl -\textgreater{} Type ID Init ;} & Obtener Type.data\_type, rechazar duplicados del ámbito actual, insertar ID, revisar Init y comprobar assignable(destino,origen).\\
+8, 9, 10 & \texttt{Type -\textgreater{} int | float | char} & Sintetizar data\_type con el tipo indicado por la palabra clave.\\
+11 & \texttt{Init -\textgreater{} = Expr} & Sintetizar present=true y data\_type=Expr.data\_type. El padre Decl valida la compatibilidad.\\
+12 & \texttt{Init -\textgreater{} epsilon} & Sintetizar present=false. No exige expresión ni tipo de inicializador.\\
+13, 14 & \texttt{Stmt -\textgreater{} Matched | Unmatched} & Visitar el hijo; no crear ámbito por la sola existencia de Stmt.\\
+15, 16 & \texttt{Matched -\textgreater{} Simple | Block} & Visitar el hijo. Si es Block, él abre y cierra su ámbito.\\
+17, 20 & \texttt{if ( Expr ) ... else ...} & Exigir condición numérica; visitar ambos cuerpos en orden fuente para comprobar estáticamente sus nombres y tipos.\\
+18, 21 & \texttt{while ( Expr ) ...} & Exigir condición numérica; revisar el cuerpo una vez, sin ejecutar iteraciones.\\
+19 & \texttt{if ( Expr ) Stmt} & Exigir condición numérica y visitar Stmt.\\
+22 & \texttt{Simple -\textgreater{} ID = Expr ;} & Buscar ID como destino de escritura, obtener tipo de Expr y comprobar compatibilidad. No actualizar valores de ejecución.\\
+23 & \texttt{Simple -\textgreater{} return Expr ;} & Obtener tipo de Expr y comprobar que sea asignable a int, el tipo de retorno de main.\\
+24 & \texttt{Simple -\textgreater{} ;} & Aceptar la sentencia vacía sin alterar la tabla.\\
+25, 28, 33, 36, 40, 44 & \texttt{Expresiones de paso} & Propagar data\_type y, si todavía es un literal simple, literal\_lexeme del único hijo.\\
+26, 27, 29, 30, 31, 32 & \texttt{Igualdad y relaciones} & Exigir dos operandos numéricos y sintetizar int. El tipo del resultado no depende de calcular su valor.\\
+34, 35, 37, 38 & \texttt{Suma, resta, producto, división} & Exigir números; promover char a int. Si algún operando es float, el resultado es float; de otro modo, int.\\
+39 & \texttt{Mul -\textgreater{} Mul \% Unary} & Exigir operandos char o int. Rechazar float y sintetizar int.\\
+41, 42 & \texttt{Unary -\textgreater{} + Unary | - Unary} & Exigir número y devolver promote(tipo del hijo).\\
+43 & \texttt{Unary -\textgreater{} ! Unary} & Exigir número y sintetizar int.\\
+45 & \texttt{Primary -\textgreater{} ID} & Buscar el nombre visible, sintetizar su tipo y registrar el vínculo con scope\_id y línea de declaración.\\
+46, 47, 48, 49 & \texttt{Primary -\textgreater{} INT | FLOAT | CHAR | STRING} & Sintetizar int, float, char o string respectivamente. Conservar el lexema original del literal, sin evaluarlo.\\
+50 & \texttt{Primary -\textgreater{} ( Expr )} & Propagar los atributos de Expr; los paréntesis no crean un ámbito.\\
+\bottomrule\end{longtable}}
+\section*{Ejemplos de compatibilidad y errores}
+Cada fila representa un cuerpo dentro de \texttt{int main()\{ ... \}}. Todas tienen sintaxis válida; la diferencia está en SDT.
+{\small\begin{longtable}{@{}p{7.5cm}p{8.1cm}@{}}\toprule Cuerpo & Resultado semántico\\\midrule\endhead
+\texttt{int x=10; return x;} & Válido.\\
+\texttt{int x="hello";} & SEM004: string no es asignable a int.\\
+\texttt{char c='a';} & Válido: char a char.\\
+\texttt{char c=65;} & SEM004: int a char es estrechamiento.\\
+\texttt{char c='a'+1;} & SEM004: la suma promueve char a int y el destino es char.\\
+\texttt{char c='a'; c=c+1;} & SEM003: la suma da int y la asignación a char se rechaza.\\
+\texttt{char c='a'; int x=c+1;} & Válido: resultado int y destino int.\\
+\texttt{int x; int x;} & SEM001: declaración duplicada en el mismo ámbito.\\
+\texttt{y=1;} & SEM002: identificador no declarado.\\\bottomrule\end{longtable}}
+El resultado registra el primer error semántico detectado. La línea, columna y lexema provienen del token responsable. Las ramas de if y el cuerpo de while se revisan estáticamente sin ejecutar el programa.
+
+\section*{Ejemplo: del árbol a la tabla de símbolos}
+\begin{lstlisting}[language=C]
+int main() {
+    int x = 10;
+    float y = x + 2.5;
+    return x;
+}
+\end{lstlisting}
+\begin{enumerate}
+\item Program fija el tipo de retorno de main en int. El bloque abre el ámbito 0.
+\item La primera declaración obtiene Type=int, registra x y revisa el literal 10. Su tipo es int: la inicialización es compatible.
+\item La segunda declaración registra y como float. Para \texttt{x + 2.5}, la búsqueda de x devuelve int y el literal tiene tipo float. La suma sintetiza float; coincide con el tipo de y.
+\item \texttt{return x;} busca x y obtiene int, compatible con el retorno de main. Al terminar el bloque se cierra su ámbito.
+\end{enumerate}
+
+\begin{tabularx}{\linewidth}{@{}l l c c X@{}}\toprule Nombre & Tipo & Ámbito & Línea & Información del inicializador\\\midrule
+x & int & 0 & 2 & Presente; tipo int; lexema literal \texttt{10}.\\
+y & float & 0 & 3 & Presente; tipo float; sin lexema literal único, porque es una expresión.\\\bottomrule\end{tabularx}
+
+El análisis conserva los registros para mostrarlos en el resultado, aunque el ámbito deje de estar activo. No calcula el valor de y ni ejecuta el retorno. Las columnas proceden de los tokens originales, no del formato de este ejemplo.
+\clearpage\section*{Ejemplo de ámbitos y sombreado}
+\begin{lstlisting}[language=C]
+int main() {
+    int x = 1;
+    { float x = 2.5; }
+    return x;
+}
+\end{lstlisting}
+La x interior pertenece a otro ámbito y puede tener otro tipo. Al cerrar sus llaves, \texttt{return x;} vuelve a encontrar la x exterior de tipo int. Dos declaraciones de x dentro del \emph{mismo} bloque sí generan SEM001. Una variable declarada únicamente dentro de un bloque no queda visible fuera de él.
+\section*{Sintaxis aceptada y semántica rechazada}
+En \texttt{int x="hello";}, el parser reconoce la producción de declaración. SDT obtiene tipo string para la expresión y tipo int para el destino; la matriz de compatibilidad rechaza la inicialización. El resultado conserva \texttt{Parsing Success!} y añade el error SDT con la posición de x. Un punto y coma faltante, en cambio, detiene el parser antes de esta revisión.
+
+\section*{Resultados del análisis}
+\begin{lstlisting}
+Parsing Success!
+SDT Verified!
+\end{lstlisting}
+Si hay error semántico, conservar \texttt{Parsing Success!} y emitir \texttt{SDT error in line n}. Con error de sintaxis emitir \texttt{Parsing error in line n}; con error léxico, \texttt{Lexical error in line n}. No informar SDT como verificado si una fase anterior falló.
+
+\end{document}
