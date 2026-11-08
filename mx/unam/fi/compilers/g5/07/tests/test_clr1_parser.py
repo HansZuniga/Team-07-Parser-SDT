@@ -314,3 +314,11 @@ def test_error_details_name_the_expected_terminals(parser):
     details = info.value.details()
     assert "unexpected ';'" in details
     assert "ID" in details and "INT" in details
+
+
+@team_table
+def test_long_program_tree_does_not_hit_the_recursion_limit(parser):
+    source = "int main() { int x;" + " x = 1;" * 3000 + " }"
+    tree = parse(parser, source).tree
+    assert tree.line == 1
+    assert len(tree.pretty().splitlines()) > 3000

@@ -25,6 +25,12 @@ Also show every parser step, or the parse tree:
     python main.py --file program.c --trace
     python main.py --file program.c --tree
 
+Full analysis: parser + SDT (Parsing Success! and SDT Verified! / SDT
+error in line n), optionally with the symbol table:
+
+    python main.py --file program.c --sdt
+    python main.py --file program.c --symbols
+
 With no arguments, it runs the professor's reading example:
 
     printf("This is an example");
@@ -37,6 +43,7 @@ from pathlib import Path
 from lexer import Lexer
 from token_stream import LexicalError, build_terminals
 from clr1_parser import ParseError, Parser, TableError
+from sdt import SemanticAnalyzer, SemanticError
 
 RESOURCES_DIR = Path(__file__).resolve().parents[2] / "resources"
 DEFAULT_EXAMPLE = Path(__file__).resolve().parents[2] / "examples" / "example_profesor.c"
@@ -91,7 +98,25 @@ def print_trace(steps) -> None:
     print()
 
 
-def run_parser(lexer: Lexer, trace: bool, tree: bool) -> None:
+def print_symbols(symbols) -> None:
+    print(f"{'NAME':<12} {'TYPE':<7} {'SCOPE':<6} {'LINE':<5} INITIALIZER")
+    print("-" * 52)
+    for symbol in symbols.records:
+        if not symbol.has_initializer:
+            init = "-"
+        elif symbol.initializer_lexeme is not None:
+            init = f"{symbol.initializer_type} {symbol.initializer_lexeme}"
+        else:
+            init = f"{symbol.initializer_type} (expression)"
+        print(
+            f"{symbol.name:<12} {symbol.data_type:<7} {symbol.scope_id:<6} "
+            f"{symbol.line:<5} {init}"
+        )
+    print()
+
+
+def run_parser(lexer: Lexer, trace: bool, tree: bool,
+               sdt: bool = False, symbols: bool = False) -> None:
     try:
         terminals = build_terminals(lexer.tokens, lexer.errors)
     except LexicalError as error:
@@ -120,6 +145,22 @@ def run_parser(lexer: Lexer, trace: bool, tree: bool) -> None:
         print()
     print(result.message)
 
+    if not (sdt or symbols):
+        return
+    try:
+        analysis = SemanticAnalyzer().analyze(result.tree)
+    except SemanticError as error:
+        if symbols:
+            print()
+            print_symbols(error.symbols)
+            print(error.details())
+        print(error)
+        return
+    if symbols:
+        print()
+        print_symbols(analysis.symbols)
+    print(analysis.message)
+
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="Team 07 lexical analyzer and CLR(1) parser")
@@ -146,6 +187,16 @@ def main() -> None:
         action="store_true",
         help="run the parser and show the parse tree",
     )
+    parser.add_argument(
+        "--sdt",
+        action="store_true",
+        help="run the parser and the semantic analysis (SDT)",
+    )
+    parser.add_argument(
+        "--symbols",
+        action="store_true",
+        help="run parser + SDT and show the symbol table",
+    )
     args = parser.parse_args()
 
     keywords_path = RESOURCES_DIR / "keywords.txt"
@@ -158,8 +209,9 @@ def main() -> None:
     else:
         lexer.tokenize_file(DEFAULT_EXAMPLE)
 
-    if args.parse or args.trace or args.tree:
-        run_parser(lexer, trace=args.trace, tree=args.tree)
+    if args.parse or args.trace or args.tree or args.sdt or args.symbols:
+        run_parser(lexer, trace=args.trace, tree=args.tree,
+                   sdt=args.sdt, symbols=args.symbols)
     elif args.terminals:
         print_terminals(lexer)
     else:
