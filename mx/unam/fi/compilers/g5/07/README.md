@@ -16,6 +16,7 @@
 ├── examples/
 │   └── example_profesor.c
 └── tests/                    # pytest
+    └── cases/                # programas de prueba + salida esperada (#10)
 ```
 
 ## Lexer → parser (issue #7)
@@ -160,3 +161,24 @@ python -m pytest tests
 
 Las pruebas con la gramática completa se saltan (`skipped`) si
 `resources/parser/` todavía no tiene los archivos del Model Designer.
+
+### Casos de prueba (issue #10)
+
+`tests/cases/` tiene 42 programas en las cuatro categorías del proyecto.
+Cada caso es un `.c` y un `.expected` con la salida exacta que debe dar
+`main.py --file <caso> --sdt`; `descriptions.json` describe cada uno.
+
+| Carpeta | Categoría | Salida |
+|---------|-----------|--------|
+| `valid/` (10) | sintaxis y semántica válidas | `Parsing Success!` + `SDT Verified!` |
+| `syntax/` (12) | sintaxis inválida | `Parsing error in line n` |
+| `semantic/` (13) | sintaxis válida, semántica inválida | `Parsing Success!` + `SDT error in line n` |
+| `lexical/` (7) | errores léxicos | `Lexical error in line n` |
+
+```bash
+python tests/cases/run_cases.py              # esperado vs. obtenido
+python tests/cases/run_cases.py --markdown   # regenera tests/cases/RESULTS.md
+```
+
+`tests/test_cases.py` corre los mismos casos dentro de pytest.
+`RESULTS.md` documenta la salida esperada y la obtenida de cada caso.

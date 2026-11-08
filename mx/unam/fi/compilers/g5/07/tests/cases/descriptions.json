@@ -1,0 +1,170 @@
+[
+  {
+    "file": "valid/01_minimal.c",
+    "description": "Programa mínimo: main con bloque vacío."
+  },
+  {
+    "file": "valid/02_declarations.c",
+    "description": "Declaraciones int/float/char con y sin inicializador."
+  },
+  {
+    "file": "valid/03_expressions.c",
+    "description": "Precedencia, paréntesis, unarios, % y comparaciones."
+  },
+  {
+    "file": "valid/04_if_else.c",
+    "description": "if, if/else e if anidado sin llaves (dangling else)."
+  },
+  {
+    "file": "valid/05_while.c",
+    "description": "while con y sin llaves, y anidado."
+  },
+  {
+    "file": "valid/06_scopes.c",
+    "description": "Bloques anidados, sombreado y variables externas visibles."
+  },
+  {
+    "file": "valid/07_widening.c",
+    "description": "Ampliación permitida: char -> int -> float."
+  },
+  {
+    "file": "valid/08_document_example.c",
+    "description": "Ejemplo del documento de reglas SDT del equipo."
+  },
+  {
+    "file": "valid/09_empty_statements.c",
+    "description": "Sentencias vacías y bloques vacíos."
+  },
+  {
+    "file": "valid/10_full_program.c",
+    "description": "Programa completo con todo el subconjunto."
+  },
+  {
+    "file": "syntax/01_missing_semicolon_declaration.c",
+    "description": "Falta ';' al final de una declaración (línea 2)."
+  },
+  {
+    "file": "syntax/02_missing_semicolon_before_brace.c",
+    "description": "Falta ';' en el return antes de '}' (línea 3)."
+  },
+  {
+    "file": "syntax/03_missing_parenthesis.c",
+    "description": "Falta ')' en la condición del if."
+  },
+  {
+    "file": "syntax/04_missing_closing_brace.c",
+    "description": "Falta la '}' final del programa."
+  },
+  {
+    "file": "syntax/05_code_after_main.c",
+    "description": "Código después de que termina main."
+  },
+  {
+    "file": "syntax/06_missing_expression.c",
+    "description": "Asignación sin valor."
+  },
+  {
+    "file": "syntax/07_compound_assignment.c",
+    "description": "'+=' no está en el subconjunto."
+  },
+  {
+    "file": "syntax/08_function_call.c",
+    "description": "Llamadas a funciones no están en el subconjunto."
+  },
+  {
+    "file": "syntax/09_missing_return_type.c",
+    "description": "main sin 'int' al inicio."
+  },
+  {
+    "file": "syntax/10_else_without_if.c",
+    "description": "else sin if."
+  },
+  {
+    "file": "syntax/11_declaration_without_name.c",
+    "description": "Declaración sin identificador."
+  },
+  {
+    "file": "syntax/12_unbalanced_parentheses.c",
+    "description": "Paréntesis de más en una expresión."
+  },
+  {
+    "file": "semantic/01_duplicate_declaration.c",
+    "description": "SEM001: x declarada dos veces en el mismo bloque."
+  },
+  {
+    "file": "semantic/02_undeclared_variable.c",
+    "description": "SEM002: y nunca se declaró."
+  },
+  {
+    "file": "semantic/03_out_of_scope.c",
+    "description": "SEM002: z solo existe dentro de su bloque."
+  },
+  {
+    "file": "semantic/04_undeclared_in_expression.c",
+    "description": "SEM002: variable no declarada dentro de una expresión."
+  },
+  {
+    "file": "semantic/05_assignment_type_mismatch.c",
+    "description": "SEM003: float no cabe en int (estrechamiento)."
+  },
+  {
+    "file": "semantic/06_char_plus_one.c",
+    "description": "SEM003: char + 1 da int y no cabe en char."
+  },
+  {
+    "file": "semantic/07_string_initialization.c",
+    "description": "SEM004: una cadena no se asigna a int."
+  },
+  {
+    "file": "semantic/08_narrowing_initialization.c",
+    "description": "SEM004: valor int inválido para char."
+  },
+  {
+    "file": "semantic/09_modulo_with_float.c",
+    "description": "SEM005: % no acepta float."
+  },
+  {
+    "file": "semantic/10_string_in_arithmetic.c",
+    "description": "SEM005: una cadena en una suma."
+  },
+  {
+    "file": "semantic/11_string_condition.c",
+    "description": "SEM006: la condición del while no es numérica."
+  },
+  {
+    "file": "semantic/12_return_float.c",
+    "description": "SEM007: main regresa int, no float."
+  },
+  {
+    "file": "semantic/13_first_error_only.c",
+    "description": "Hay dos errores; solo se reporta el primero (línea 3)."
+  },
+  {
+    "file": "lexical/01_invalid_character.c",
+    "description": "'@' no pertenece al lenguaje."
+  },
+  {
+    "file": "lexical/02_malformed_number.c",
+    "description": "Número mal formado: 12abc."
+  },
+  {
+    "file": "lexical/03_unterminated_string.c",
+    "description": "Cadena sin comilla de cierre."
+  },
+  {
+    "file": "lexical/04_malformed_char.c",
+    "description": "Literal de carácter con dos caracteres."
+  },
+  {
+    "file": "lexical/05_logical_and.c",
+    "description": "'&&' no está en el subconjunto: '&' es error léxico."
+  },
+  {
+    "file": "lexical/06_before_syntax_error.c",
+    "description": "Hay error de sintaxis (línea 2) y léxico (línea 4): el léxico detiene todo antes del parser."
+  },
+  {
+    "file": "lexical/07_before_semantic_error.c",
+    "description": "Hay error semántico (línea 2) y léxico (línea 3): el parser y el SDT nunca corren."
+  }
+]
