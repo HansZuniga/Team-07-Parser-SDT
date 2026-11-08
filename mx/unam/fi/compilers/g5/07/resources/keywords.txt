@@ -1,0 +1,8 @@
+print
+int
+float
+char
+return
+if
+else
+while
